@@ -14,6 +14,8 @@ import './costs/costs.css';
 import './schedule/schedule.css';
 import './docs/docs.css';
 import './tour/tour.css';
+import './styles/desktop-only.css';
+import { isDesktopOnlyBlocked, showDesktopOnly } from './app/desktop-only';
 import { start } from './app/start';
 import { initTheme } from './shell/theme';
 
@@ -21,4 +23,7 @@ import { initTheme } from './shell/theme';
 initTheme();
 
 const root = document.getElementById('app');
-if (root) void start(root);
+if (root) {
+  if (isDesktopOnlyBlocked()) showDesktopOnly(root);
+  else void start(root);
+}

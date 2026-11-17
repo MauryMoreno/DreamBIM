@@ -1,0 +1,36 @@
+/* Web demo on a phone: the app is replaced by this notice (see app/desktop-only.ts). */
+#app.desktop-only-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--app-bg);
+  color: var(--text);
+}
+
+.desktop-only-box {
+  width: 100%;
+  max-width: 460px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.desktop-only-box img {
+  width: 72px;
+  height: 72px;
+}
+
+.desktop-only-box h1 {
+  margin: 16px 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.desktop-only-box p {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+}
+
+.desktop-only-box .desktop-only-hint {
+  font-size: 13px;
+}
