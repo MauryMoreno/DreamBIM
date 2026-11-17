@@ -50,22 +50,12 @@ export class Composer {
         for (const [k, p] of src.payloads) target.payloads.set(k, p);
         for (const k of src.loaded) target.loaded.add(k);
       }
-      for (const [name, ref] of Object.entries(flat.children)) {
-        if (ref === null) { target.children.delete(name); continue; }
-        const c = this.resolve(ref);
-        if (c) target.children.set(name, c);
-      }
-      for (const [k, v] of Object.entries(flat.attributes)) {
-        if (v === null) target.attributes.delete(k);
-        else target.attributes.set(k, v);
-      }
       for (const [set, opts] of Object.entries(flat.variants)) {
         let v = target.variants.get(set);
         if (!v) target.variants.set(set, v = { options: new Map(), selected: null, applied: null });
         for (const [o, ref] of Object.entries(opts)) v.options.set(o, ref);
         v.selected ??= v.options.keys().next().value ?? null;
       }
-      for (const [k, p] of Object.entries(flat.payloads)) target.payloads.set(k, p);
       for (const [set, option] of Object.entries(flat.variantSelection)) {
         const v = target.variants.get(set);
         if (!v || !v.options.has(option)) {
@@ -76,6 +66,16 @@ export class Composer {
         revert(target, v);
         v.selected = option;
       }
+      for (const [name, ref] of Object.entries(flat.children)) {
+        if (ref === null) { target.children.delete(name); continue; }
+        const c = this.resolve(ref);
+        if (c) target.children.set(name, c);
+      }
+      for (const [k, v] of Object.entries(flat.attributes)) {
+        if (v === null) target.attributes.delete(k);
+        else target.attributes.set(k, v);
+      }
+      for (const [k, p] of Object.entries(flat.payloads)) target.payloads.set(k, p);
     }
     this.applyVariants(target);
     this.applyPayloads(target);
