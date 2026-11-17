@@ -50,3 +50,16 @@ describe('payloads', () => {
     expect(r.warnings).toEqual([]);
   });
 });
+
+describe('provenance.hasOwn', () => {
+  it('is true only for a key the data node writes itself with a value', () => {
+    const r = compose([file([
+      { path: 'a', inherits: { c: 'cls' }, attributes: { own: 1, gone: null } },
+      { path: 'cls', attributes: { inherited: 2 } },
+    ])]);
+    expect(r.provenance.hasOwn('a', 'own')).toBe(true);
+    expect(r.provenance.hasOwn('a', 'gone')).toBe(false);
+    expect(r.provenance.hasOwn('a', 'inherited')).toBe(false);
+    expect(r.provenance.hasOwn('missing', 'own')).toBe(false);
+  });
+});

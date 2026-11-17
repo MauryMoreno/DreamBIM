@@ -113,9 +113,14 @@ export function makeProvenance(
     attributeSources: (path) => Object.fromEntries(Object.keys(nodes.get(path)?.attributes ?? {}).map((k) => [k, sourceFor(path, k)])),
     attributesOf: (path) => {
       if (!nodes.has(head(path))) return null;
-      // New, ephemeral Composer: it shares neither cache nor warnings with compose
-      const w = new Composer(nodes, payloadFiles, payloadRoots).resolve(path);
+      // New, ephemeral Composer: it shares neither cache nor warnings with compose,
+      // but it reuses the prefix index of this provenance instead of rebuilding it.
+      const w = new Composer(nodes, payloadFiles, payloadRoots, hasDataUnder).resolve(path);
       return w ? Object.fromEntries(w.attributes) : null;
+    },
+    hasOwn: (path, key) => {
+      const a = nodes.get(path)?.attributes;
+      return !!a && key in a && a[key] !== null;
     },
     // Empty on purpose if `node` or an ancestor has variants (out of scope: the variant may
     // override attributes or replace children and we would give a false origin). With cycles, the result

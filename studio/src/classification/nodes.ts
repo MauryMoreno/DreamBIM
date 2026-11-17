@@ -38,6 +38,7 @@ export function classItems(result: ComposeResult): ClassItem[] {
   for (const table of ['21', '22', '23']) {
     const key = tableKey(table);
     for (const path of provenance.pathsWith(key)) {
+      if (provenance.hasOwn(path, K_CLASS)) continue;
       const attrs = provenance.attributesOf(path);
       const source = provenance.sourcesOf(path)[0];
       const v = attrs?.[key];

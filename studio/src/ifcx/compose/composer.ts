@@ -12,6 +12,7 @@ export class Composer {
     private nodes: Map<string, FlatNode>,
     private payloadFiles: ReadonlyMap<string, IfcxFile> = new Map(),
     private payloadRoots: ReadonlyMap<string, string[]> = new Map(),
+    private hasData?: (path: string) => boolean,
   ) {}
 
   /** Returns an independent copy of the class/instance node `ref` ("uuid" or "uuid/a/b"). */
@@ -121,6 +122,7 @@ export class Composer {
 
   private prefixes: Set<string> | null = null;
   private hasDataUnder(p: string): boolean {
+    if (this.hasData) return this.hasData(p);
     this.prefixes ??= nestedPrefixes(this.nodes);
     return this.prefixes.has(p);
   }

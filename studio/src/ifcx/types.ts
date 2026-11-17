@@ -103,6 +103,8 @@ export interface Provenance {
   attributeSources(path: string): Record<string, ProvenanceSource>;
   /** Atributos compuestos de una ruta de datos ("uuid" o "uuid/Body"), a demanda; null si no existe. */
   attributesOf(path: string): Record<string, unknown> | null;
+  /** Does the data node at `path` write `key` itself with a value that is not null? No inheritance. */
+  hasOwn(path: string, key: string): boolean;
   /** On demand, for ONE node: where each composed attribute comes from (Task 3). */
   explain(node: ComposedNode): Record<string, AttributeOrigin>;
 }
