@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { ComposedNode } from '../../ifcx/types';
 import { ColorOverride, type ColorFn, type ElementColor } from '../coloroverride';
+import { pullForward } from '../edgedepth';
 import { Highlights } from '../highlight';
 import { focusRole, type LevelFocus } from '../levels';
 import { StyleMaterials, type VisualStyle } from '../styles';
@@ -46,7 +47,7 @@ export class ViewerAppearance {
   private styleMats = new StyleMaterials();
   // per-element colour above its own material (setColorOverride)
   private colorOverride = new ColorOverride();
-  private edgeMat = new THREE.LineBasicMaterial({ color: 0x2f343a });
+  private edgeMat = pullForward(new THREE.LineBasicMaterial({ color: 0x2f343a }));
 
   constructor(private core: ViewerCore, private peers: AppearancePeers) {}
 
@@ -163,8 +164,8 @@ export class ViewerAppearance {
    */
   setColorOverride(fn: ColorFn | null): void {
     this.colorOverride.set(fn);
-    this.peers.applyClipping(); // the new materials are clipped too
     this.applyMaterials();
+    this.peers.applyClipping(); // the materials created above are clipped too
   }
 
   /**
@@ -173,8 +174,8 @@ export class ViewerAppearance {
    */
   setSavedColors(colors: ReadonlyMap<string, ElementColor> | null): void {
     this.colorOverride.setSaved(colors);
-    this.peers.applyClipping();
     this.applyMaterials();
+    this.peers.applyClipping(); // the materials created above are clipped too
   }
 
   /**
@@ -183,8 +184,8 @@ export class ViewerAppearance {
    */
   setAssistantColors(colors: ReadonlyMap<string, ElementColor> | null): void {
     this.colorOverride.setTop(colors);
-    this.peers.applyClipping();
     this.applyMaterials();
+    this.peers.applyClipping(); // the materials created above are clipped too
   }
 
   /** Path of the element a mesh belongs to (stored on the mesh after the first time). */

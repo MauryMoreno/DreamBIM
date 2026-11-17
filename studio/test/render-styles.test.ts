@@ -43,16 +43,6 @@ describe('StyleMaterials', () => {
     expect(s.get(base, 'textures')).toBe(base); // Textures sigue con la imagen
   });
 
-  it('Shaded and Consistent Colors offset their faces so the edges do not flicker on top', () => {
-    const base = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-    const s = new StyleMaterials();
-    const shaded = s.get(base, 'shaded');
-    expect(shaded).not.toBe(base);
-    expect(shaded.polygonOffset).toBe(true);
-    expect(base.polygonOffset).toBe(false);
-    expect(s.get(base, 'consistent').polygonOffset).toBe(true);
-  });
-
   it('Consistent Colors: color plano sin luz, con la misma transparencia', () => {
     const m = new StyleMaterials().get(conTextura(), 'consistent') as THREE.MeshBasicMaterial;
     expect(m).toBeInstanceOf(THREE.MeshBasicMaterial);
@@ -62,12 +52,11 @@ describe('StyleMaterials', () => {
     expect(m.map).toBeNull();
   });
 
-  it('Hidden Line: flat white opaque faces, offset so the edges stay on top', () => {
+  it('Hidden Line: flat white opaque faces', () => {
     const m = new StyleMaterials().get(conTextura(), 'hidden') as THREE.MeshBasicMaterial;
     expect(m).toBeInstanceOf(THREE.MeshBasicMaterial);
     expect(m.color.getHex()).toBe(0xffffff);
     expect(m.transparent).toBe(false);
-    expect(m.polygonOffset).toBe(true);
   });
 
   it('Wireframe: las caras no se dibujan', () => {

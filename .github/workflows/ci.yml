@@ -36,11 +36,8 @@ jobs:
       - name: Build the web demo (for the bundle budget test)
         run: npm run build:web
 
-      # workspace.test.ts mounts the whole workspace: the default 2 GB heap of the runner is not enough.
       - name: Test
         run: npm test
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Knip
         run: npm run knip

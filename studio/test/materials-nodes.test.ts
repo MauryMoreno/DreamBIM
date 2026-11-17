@@ -66,6 +66,21 @@ describe('materialNodes', () => {
     expect(materialNodes(r, isDocument)[0].site).toBe('document');
   });
 
+  it('4000 elements that carry a material are scanned in well under a second', () => {
+    const n = 4000;
+    const data: IfcxNode[] = [{ path: 'proj', children: Object.fromEntries(Array.from({ length: n }, (_, i) => [`e${i}`, `e${i}`])) }];
+    for (let i = 0; i < n; i++) {
+      data.push(
+        { path: `e${i}`, children: { Body: `b${i}` }, attributes: { 'bsi::ifc::class': { code: 'IfcWall' }, 'bsi::ifc::material': { code: `M${i % 5}` } } },
+        { path: `b${i}`, attributes: { v: i } },
+      );
+    }
+    const r = compose([file('m', data)]);
+    const t0 = performance.now();
+    expect(materialNodes(r, () => true)).toEqual([]);
+    expect(performance.now() - t0).toBeLessThan(1000);
+  });
+
   it('an over of the document changes the color but the source is still the library', () => {
     const over: IfcxNode = { path: M, attributes: { 'bsi::ifc::presentation::diffuseColor': [1, 0, 0] } };
     const r = compose([lib, file('m', [pile, over])], { sources: [libSource('C:/b/lib.ifcx'), docSource] });

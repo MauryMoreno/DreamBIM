@@ -93,6 +93,7 @@ export function readCostSystem(result: ComposeResult): CostSystem | null {
   const seen = new Set<string>();
   const list: CostCode[] = [];
   for (const path of provenance.pathsWith(v.attribute)) {
+    if (provenance.hasOwn(path, K_CLASS)) continue;
     const attrs = provenance.attributesOf(path);
     const a = attrs?.[v.attribute];
     if (!attrs || K_CLASS in attrs || !isObject(a) || typeof a.code !== 'string' || !a.code || seen.has(a.code)) continue;

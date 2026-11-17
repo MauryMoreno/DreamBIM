@@ -19,15 +19,17 @@ export class PayloadsService {
     const gen = this.ctx.state.generation;
     return this.ctx.queue.enqueue(async () => {
       if (gen !== this.ctx.state.generation) return false;
-      if (on === this.ctx.state.payloads.has(uri)) return true;
+      const docPath = this.ctx.stack.docPath();
+      const l = this.ctx.stack.layer(layerId);
+      // the payload is identified by the absolute location it resolves to, not by its declared uri
+      const key = resolveUri(l ? resolveUri(docPath, l.uri) : docPath, uri);
+      if (on === this.ctx.state.payloads.has(key)) return true;
       if (on) {
-        const docPath = this.ctx.stack.docPath();
-        const l = this.ctx.stack.layer(layerId);
-        const file = await this.ctx.links.readLinked(resolveUri(l ? resolveUri(docPath, l.uri) : docPath, uri), 'load');
+        const file = await this.ctx.links.readLinked(key, 'load');
         if (!file || gen !== this.ctx.state.generation) return false;
-        this.ctx.state.payloads.set(uri, file);
+        this.ctx.state.payloads.set(key, file);
       } else {
-        this.ctx.state.payloads.delete(uri);
+        this.ctx.state.payloads.delete(key);
       }
       await this.ctx.stack.recompose();
       return true;

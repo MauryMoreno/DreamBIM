@@ -50,7 +50,7 @@ export class StackService {
     const overlays = this.ctx.sidecars.overlays();
     return layer && (all.length || this.ctx.state.payloads.size || overlays.length || this.ctx.state.libs.size)
       ? perfSpanAsync('studio.compose', () =>
-          composeStack(m.name, m.path, layer, all, this.ctx.state.files, this.ctx.libraryFiles.libFetcher, this.ctx.state.payloads, overlays)).then((r) => this.withColors(r))
+          composeStack(m.name, this.docPath() ?? m.path, layer, all, this.ctx.state.files, this.ctx.libraryFiles.libFetcher, this.ctx.state.payloads, overlays)).then((r) => this.withColors(r))
       : Promise.resolve(m);
   }
 

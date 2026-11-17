@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import { animOffset, orthoDistance, type CameraState } from '../levels';
+import { animOffset, clipRange, orthoDistance, type CameraState } from '../levels';
 import { WALK_EYE, WalkMode } from '../walk';
+import { shownBox } from '../worldbox';
 import type { ViewerCore } from './core';
 
 export type ViewName = 'iso' | 'top' | 'front' | 'right';
@@ -38,6 +39,8 @@ export class ViewerCamera {
   private proj: 'perspective' | 'orthographic' = 'perspective';
   private anim: { from: THREE.Vector3; to: THREE.Vector3; tFrom: THREE.Vector3; tTo: THREE.Vector3; start: number } | null = null;
   private raycaster = new THREE.Raycaster();
+  /** Distance to the target at the last clip update, to skip recomputing it on every frame. */
+  private clipDistance: number | null = null;
 
   constructor(private core: ViewerCore, private peers: CameraPeers) {}
 
@@ -50,7 +53,7 @@ export class ViewerCamera {
         if (o) box.expandByObject(o);
       }
     } else {
-      this.peers.modelRoot().traverseVisible(o => { if (o.userData.baseMaterial) box.expandByObject(o, false); });
+      box.copy(shownBox(this.peers.modelRoot()));
       if (box.isEmpty()) box.copy(this.peers.bbox);
     }
     if (box.isEmpty()) return;
@@ -89,8 +92,10 @@ export class ViewerCamera {
 
   private moveCamera(pos: THREE.Vector3, target: THREE.Vector3, animate: boolean) {
     const r = pos.distanceTo(target);
-    this.core.camera.near = Math.max(r / 1e4, 1e-3);
-    this.core.camera.far = Math.max(r * 100, this.peers.bbox.getSize(new THREE.Vector3()).length() * 10);
+    const { near, far } = clipRange(r, this.peers.bbox.getSize(new THREE.Vector3()).length());
+    this.core.camera.near = near;
+    this.core.camera.far = far;
+    this.clipDistance = r;
     this.core.camera.updateProjectionMatrix();
     if (!animate) {
       this.core.camera.position.copy(pos);
@@ -233,7 +238,19 @@ export class ViewerCamera {
       moved = true;
     }
     if (!this.walk && this.core.controls.update()) moved = true;
+    if (!this.walk) this.updateClip();
     return moved;
+  }
+
+  /** Follows the orbit distance: zooming in or out moves the near and far planes with it. */
+  private updateClip(): void {
+    const d = this.core.camera.position.distanceTo(this.core.controls.target);
+    if (this.clipDistance !== null && Math.abs(d - this.clipDistance) <= this.clipDistance * 0.01) return;
+    this.clipDistance = d;
+    const { near, far } = clipRange(d, this.peers.bbox.getSize(new THREE.Vector3()).length());
+    this.core.camera.near = near;
+    this.core.camera.far = far;
+    this.core.camera.updateProjectionMatrix();
   }
 
   /** Floor (almost horizontal face) at the centre of the screen, if one is being looked at. */

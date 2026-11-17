@@ -49,29 +49,25 @@ function derive(base: WithColor, style: VisualStyle, hiddenColor: number): THREE
   switch (style) {
     case 'shaded':
       // Lambert with the SHADED_LIGHT light, no environment reflections and no tone mapping (like Revit)
-      return withOffset(
-        new THREE.MeshLambertMaterial({
-          color: shadingColor(base),
-          transparent: base.transparent,
-          opacity: base.opacity,
-          depthWrite: base.depthWrite,
-          side: base.side,
-          toneMapped: false,
-        }),
-      );
+      return new THREE.MeshLambertMaterial({
+        color: shadingColor(base),
+        transparent: base.transparent,
+        opacity: base.opacity,
+        depthWrite: base.depthWrite,
+        side: base.side,
+        toneMapped: false,
+      });
     case 'consistent':
-      return withOffset(
-        new THREE.MeshBasicMaterial({
-          color: shadingColor(base),
-          transparent: base.transparent,
-          opacity: base.opacity,
-          side: base.side,
-          toneMapped: false,
-        }),
-      );
+      return new THREE.MeshBasicMaterial({
+        color: shadingColor(base),
+        transparent: base.transparent,
+        opacity: base.opacity,
+        side: base.side,
+        toneMapped: false,
+      });
     case 'hidden':
       // opaque faces of the background colour: only the edges are read, and they hide what is behind
-      return withOffset(new THREE.MeshBasicMaterial({ color: hiddenColor, side: base.side }));
+      return new THREE.MeshBasicMaterial({ color: hiddenColor, side: base.side });
     case 'wireframe':
       return new THREE.MeshBasicMaterial({ visible: false });
     default:
@@ -111,12 +107,4 @@ export function shadedSunDir(forward: THREE.Vector3, up: THREE.Vector3, out = ne
   const right = new THREE.Vector3().crossVectors(Z, back); // Z × towards-camera = right
   const h = Math.cos(SHADED_LIGHT.elevation) * Math.SQRT1_2;
   return out.copy(right).multiplyScalar(h).addScaledVector(back, h).addScaledVector(Z, Math.sin(SHADED_LIGHT.elevation));
-}
-
-/** Faces a little further back: the edges draw on top without flickering. */
-function withOffset<M extends THREE.Material>(m: M): M {
-  m.polygonOffset = true;
-  m.polygonOffsetFactor = 1;
-  m.polygonOffsetUnits = 1;
-  return m;
 }

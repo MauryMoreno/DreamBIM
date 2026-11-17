@@ -12,6 +12,7 @@ export class Composer {
     private nodes: Map<string, FlatNode>,
     private payloadFiles: ReadonlyMap<string, IfcxFile> = new Map(),
     private payloadRoots: ReadonlyMap<string, string[]> = new Map(),
+    private hasData?: (path: string) => boolean,
   ) {}
 
   /** Returns an independent copy of the class/instance node `ref` ("uuid" or "uuid/a/b"). */
@@ -50,22 +51,12 @@ export class Composer {
         for (const [k, p] of src.payloads) target.payloads.set(k, p);
         for (const k of src.loaded) target.loaded.add(k);
       }
-      for (const [name, ref] of Object.entries(flat.children)) {
-        if (ref === null) { target.children.delete(name); continue; }
-        const c = this.resolve(ref);
-        if (c) target.children.set(name, c);
-      }
-      for (const [k, v] of Object.entries(flat.attributes)) {
-        if (v === null) target.attributes.delete(k);
-        else target.attributes.set(k, v);
-      }
       for (const [set, opts] of Object.entries(flat.variants)) {
         let v = target.variants.get(set);
         if (!v) target.variants.set(set, v = { options: new Map(), selected: null, applied: null });
         for (const [o, ref] of Object.entries(opts)) v.options.set(o, ref);
         v.selected ??= v.options.keys().next().value ?? null;
       }
-      for (const [k, p] of Object.entries(flat.payloads)) target.payloads.set(k, p);
       for (const [set, option] of Object.entries(flat.variantSelection)) {
         const v = target.variants.get(set);
         if (!v || !v.options.has(option)) {
@@ -76,6 +67,16 @@ export class Composer {
         revert(target, v);
         v.selected = option;
       }
+      for (const [name, ref] of Object.entries(flat.children)) {
+        if (ref === null) { target.children.delete(name); continue; }
+        const c = this.resolve(ref);
+        if (c) target.children.set(name, c);
+      }
+      for (const [k, v] of Object.entries(flat.attributes)) {
+        if (v === null) target.attributes.delete(k);
+        else target.attributes.set(k, v);
+      }
+      for (const [k, p] of Object.entries(flat.payloads)) target.payloads.set(k, p);
     }
     this.applyVariants(target);
     this.applyPayloads(target);
@@ -102,11 +103,12 @@ export class Composer {
   /** Composes the loaded payloads, below what the node already has. */
   private applyPayloads(target: WorkNode) {
     for (const [name, p] of target.payloads) {
-      if (target.loaded.has(name) || !this.payloadFiles.has(p.uri)) continue;
+      const key = p.key ?? p.uri;
+      if (target.loaded.has(name) || !this.payloadFiles.has(key)) continue;
       target.loaded.add(name);
       const add = (k: string, c: WorkNode) => { if (!target.children.has(k)) target.children.set(k, c); };
       if (!p.path) {
-        for (const r of this.payloadRoots.get(p.uri) ?? []) {
+        for (const r of this.payloadRoots.get(key) ?? []) {
           const c = this.resolve(r);
           if (c) add(r, c);
         }
@@ -121,6 +123,7 @@ export class Composer {
 
   private prefixes: Set<string> | null = null;
   private hasDataUnder(p: string): boolean {
+    if (this.hasData) return this.hasData(p);
     this.prefixes ??= nestedPrefixes(this.nodes);
     return this.prefixes.has(p);
   }

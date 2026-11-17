@@ -46,6 +46,9 @@ function check(desc: IfcxValueDescription, value: unknown, schemas: Schemas): st
       return null;
     }
     case 'Array': {
+      if (ArrayBuffer.isView(value) && !(value instanceof DataView)) {
+        return numericLeaf(desc) ? null : 'expected Array';
+      }
       if (!Array.isArray(value)) return 'expected Array';
       if (!desc.arrayRestrictions) return 'Array schema without arrayRestrictions';
       for (let i = 0; i < value.length; i++) {
@@ -57,6 +60,13 @@ function check(desc: IfcxValueDescription, value: unknown, schemas: Schemas): st
     default:
       return `unexpected dataType ${desc.dataType}`;
   }
+}
+
+/** Whether the leaf of an array description is numeric (typed arrays stand for those). */
+function numericLeaf(desc: IfcxValueDescription): boolean {
+  let d = desc;
+  while (d.dataType === 'Array' && d.arrayRestrictions) d = d.arrayRestrictions.value;
+  return d.dataType === 'Real' || d.dataType === 'Integer';
 }
 
 const nodes = (n: number) => `${n} ${n === 1 ? 'node' : 'nodes'}`;

@@ -31,11 +31,20 @@ export function compose(layers: IfcxFile[], opts: ComposeOptions = {}): ComposeR
 
   const payloadRoots = new Map<string, string[]>();
   for (const [uri, f] of payloads) payloadRoots.set(uri, findRoots(flatten([f])));
+  if (payloads.size > 0) {
+    const layerRoots = new Set(findRoots(flatten(layers)));
+    for (const [uri, roots] of payloadRoots) payloadRoots.set(uri, roots.filter((r) => !layerRoots.has(r)));
+  }
   const hidden = new Set([...payloadRoots.values()].flat());
 
   const definedIn = new Map<string, number[]>();
-  const nodes = flatten(all, definedIn);
+  const warnings: string[] = [];
+  const keyOf = opts.payloadKey
+    ? (uri: string, li: number) => opts.payloadKey!(uri, li - payloads.size)
+    : undefined;
+  const nodes = flatten(all, definedIn, warnings, keyOf);
   const composer = new Composer(nodes, payloads, payloadRoots);
+  composer.warnings = warnings;
   const roots = findRoots(nodes).filter((r) => !hidden.has(r));
 
   const byOrigin = new Map<string, ComposedNode[]>();

@@ -47,7 +47,7 @@ class FakeViewer implements WorkspaceViewer {
   }
   setModel(root: ComposedNode | null) {
     this.log('setModel', root);
-    return { nodes: 0, meshes: 0, curves: 0, points: 0, triangles: 0 };
+    return { nodes: 0, meshes: 0, curves: 0, points: 0, triangles: 0, failed: 0 };
   }
   disposeModel() { this.log('disposeModel'); }
   setEmptyGrid(e: number | null) { this.log('setEmptyGrid', e); }

@@ -23,9 +23,17 @@ export function isInvisible(a: Attrs) {
 
 export function transformOf(a: Attrs): THREE.Matrix4 | null {
   const t = a['usd::xformop']?.transform;
-  if (!Array.isArray(t)) return null;
+  if (!Array.isArray(t) || t.length !== 4) return null;
+  const flat: number[] = [];
+  for (const row of t) {
+    if (!Array.isArray(row) || row.length !== 4) return null;
+    for (const v of row) {
+      if (typeof v !== 'number' || !Number.isFinite(v)) return null;
+      flat.push(v);
+    }
+  }
   // USD stores matrices by rows with the translation in the last row.
-  return new THREE.Matrix4().fromArray(t.flat());
+  return new THREE.Matrix4().fromArray(flat);
 }
 
 // --- Materials ------------------------------------------------------------
@@ -105,9 +113,6 @@ export function surfaceMaterial(node: ComposedNode): THREE.Material {
         transparent,
         depthWrite: !transparent, // glass must not hide what is behind it
         side: gltf.doubleSided ? THREE.DoubleSide : THREE.FrontSide,
-        polygonOffset: true,
-        polygonOffsetFactor: 1,
-        polygonOffsetUnits: 1,
       });
       if (colorTex) mat.map = loadTexture(colorTex, true, repeat);
       if (normalTex) {
@@ -136,9 +141,6 @@ export function surfaceMaterial(node: ComposedNode): THREE.Material {
       opacity,
       depthWrite: opacity >= 1,
       side: THREE.DoubleSide,
-      polygonOffset: true,
-      polygonOffsetFactor: 1,
-      polygonOffsetUnits: 1,
     });
     m.userData.srgbColor = true; // IFC diffuseColor: sRGB (Shaded and Consistent Colors reinterpret it)
     materialCache.set(key, m);
@@ -180,6 +182,15 @@ function meshGeometry(mesh: Attrs): THREE.BufferGeometry {
   const nv = pos.length / 3;
   const idx: ArrayLike<number> = mesh.faceVertexIndices ?? [];
   const counts: ArrayLike<number> | undefined = mesh.faceVertexCounts;
+  for (let i = 0; i < idx.length; i++) {
+    const v = idx[i];
+    if (!Number.isInteger(v) || v < 0 || v >= nv) throw new Error('mesh index out of range');
+  }
+  if (counts) {
+    let total = 0;
+    for (let i = 0; i < counts.length; i++) total += counts[i];
+    if (total > idx.length) throw new Error('mesh face counts exceed the indices');
+  }
   let allTris = true;
   if (counts) for (let i = 0; i < counts.length; i++) if (counts[i] !== 3) { allTris = false; break; }
   const Idx = nv < 65536 ? Uint16Array : Uint32Array;
@@ -328,4 +339,14 @@ export function buildObject(node: ComposedNode, kind: GeometryKind, level = 0): 
   g.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(b64ToBuffer(p.positions)), 3));
   if (p.colors) g.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(b64ToBuffer(p.colors)), 3));
   return pointsObject(g, !!p.colors);
+}
+
+/** `buildObject`, or null after a warning when the node's geometry is unusable. */
+export function tryBuildObject(node: ComposedNode, kind: GeometryKind, level = 0): THREE.Object3D | null {
+  try {
+    return buildObject(node, kind, level);
+  } catch (e) {
+    console.warn('[ifcx] could not draw', node.path, e instanceof Error ? e.message : String(e));
+    return null;
+  }
 }

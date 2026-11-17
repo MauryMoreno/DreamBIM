@@ -124,6 +124,7 @@ export function materialNodes(result: ComposeResult, isDocument: (s: ProvenanceS
   const { provenance } = result;
   const out = new Map<string, MaterialNode>();
   for (const path of provenance.pathsWith(K_MATERIAL)) {
+    if (provenance.hasOwn(path, K_CLASS)) continue;
     const attrs = provenance.attributesOf(path);
     const source = provenance.sourcesOf(path)[0];
     if (!attrs || !source || K_CLASS in attrs) continue;
