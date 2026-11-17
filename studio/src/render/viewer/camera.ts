@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { animOffset, orthoDistance, type CameraState } from '../levels';
 import { WALK_EYE, WalkMode } from '../walk';
+import { shownBox } from '../worldbox';
 import type { ViewerCore } from './core';
 
 export type ViewName = 'iso' | 'top' | 'front' | 'right';
@@ -50,7 +51,7 @@ export class ViewerCamera {
         if (o) box.expandByObject(o);
       }
     } else {
-      this.peers.modelRoot().traverseVisible(o => { if (o.userData.baseMaterial) box.expandByObject(o, false); });
+      box.copy(shownBox(this.peers.modelRoot()));
       if (box.isEmpty()) box.copy(this.peers.bbox);
     }
     if (box.isEmpty()) return;
