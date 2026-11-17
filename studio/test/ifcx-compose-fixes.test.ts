@@ -63,3 +63,26 @@ describe('provenance.hasOwn', () => {
     expect(r.provenance.hasOwn('missing', 'own')).toBe(false);
   });
 });
+
+describe('malformed data', () => {
+  const bad = (data: unknown[]) => compose([file(data as IfcxNode[])]);
+
+  it('a node without a valid path is ignored with a warning', () => {
+    const r = bad([{ attributes: { a: 1 } }, null, { path: '' }, { path: 'ok', attributes: { a: 1 } }]);
+    expect(r.root.children.map((c) => c.name)).toEqual(['ok']);
+    expect(r.warnings).toEqual(['Ignored 3 nodes without a valid path']);
+  });
+
+  it('a reference that is not a string or null is ignored with a warning', () => {
+    const r = bad([{ path: 'a', children: { x: 5, y: 'b' }, inherits: { i: {} } }, { path: 'b' }]);
+    expect(r.byPath.has('/a/y')).toBe(true);
+    expect(r.byPath.has('/a/x')).toBe(false);
+    expect(r.warnings).toEqual(['Ignored invalid reference "a" children.x', 'Ignored invalid reference "a" inherits.i']);
+  });
+
+  it('children, inherits or attributes that are not an object are ignored with a warning', () => {
+    const r = bad([{ path: 'a', children: [], attributes: 'text' }]);
+    expect(r.byPath.has('/a')).toBe(true);
+    expect(r.warnings).toEqual(['Ignored invalid "children" at "a"', 'Ignored invalid "attributes" at "a"']);
+  });
+});

@@ -20,6 +20,12 @@ describe('packMeshes', () => {
     expect(packMeshes(f)).toEqual([]); // idempotente
   });
 
+  it('a mesh with a point that is not a triple is left unpacked', () => {
+    const f = file([{ path: 'm', attributes: { 'usd::usdgeom::mesh': { points: [[0, 0, 0], null], faceVertexIndices: [0, 1, 0] } } }] as unknown as IfcxNode[]);
+    expect(packMeshes(f)).toEqual([]);
+    expect(Array.isArray((f.data[0].attributes!['usd::usdgeom::mesh'] as { points: unknown }).points)).toBe(true);
+  });
+
   it('sin faceVertexCounts no los inventa; ignora nodos sin malla', () => {
     const f = file([
       { path: 'a' },

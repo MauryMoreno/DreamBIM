@@ -5,14 +5,30 @@ export const head = (p: string) => p.split('/')[0];
 
 export const tail = (p: string) => p.split('/').slice(1).join('/');
 
+const isPlain = (v: unknown): v is Record<string, unknown> =>
+  typeof v === 'object' && v !== null && !Array.isArray(v);
+
 /**
  * Fases 1 y 2: federar y aplanar. `null` en children/inherits/attributes elimina.
  * With `definedIn`, it annotates per path the indexes of the files that write it (in order).
+ * With `warnings`, every ignored malformed item pushes one line.
  */
-export function flatten(layers: IfcxFile[], definedIn?: Map<string, number[]>): Map<string, FlatNode> {
+export function flatten(layers: IfcxFile[], definedIn?: Map<string, number[]>, warnings?: string[]): Map<string, FlatNode> {
   const out = new Map<string, FlatNode>();
+  const said = new Set<string>();
+  const ignore = (line: string) => {
+    if (!warnings || said.has(line)) return;
+    said.add(line);
+    warnings.push(line);
+  };
+  let withoutPath = 0;
   for (let li = 0; li < layers.length; li++) {
-    for (const n of layers[li].data as IfcxNode[]) {
+    for (const raw of layers[li].data as unknown[]) {
+      const n = raw as IfcxNode;
+      if (!isPlain(n) || typeof n.path !== 'string' || !n.path) {
+        withoutPath++;
+        continue;
+      }
       let f = out.get(n.path);
       if (!f) {
         f = { path: n.path, children: {}, inherits: {}, attributes: {}, variants: {}, variantSelection: {}, payloads: {} };
@@ -22,17 +38,36 @@ export function flatten(layers: IfcxFile[], definedIn?: Map<string, number[]>): 
         const d = definedIn.get(n.path);
         if (d) d.push(li); else definedIn.set(n.path, [li]);
       }
-      for (const [k, v] of Object.entries(n.children ?? {})) f.children[k] = v;
-      for (const [k, v] of Object.entries(n.inherits ?? {})) {
-        if (v === null) delete f.inherits[k];
-        else f.inherits[k] = v;
+      /** The field as a plain object, or undefined (with a warning) when it is present but malformed. */
+      const field = (name: keyof IfcxNode): Record<string, unknown> | undefined => {
+        const v = n[name];
+        if (v === undefined) return undefined;
+        if (isPlain(v)) return v;
+        ignore(`Ignored invalid "${name}" at "${n.path}"`);
+        return undefined;
+      };
+      for (const [k, v] of Object.entries(field('children') ?? {})) {
+        if (v !== null && typeof v !== 'string') {
+          ignore(`Ignored invalid reference "${n.path}" children.${k}`);
+          continue;
+        }
+        f.children[k] = v;
       }
-      for (const [k, v] of Object.entries(n.attributes ?? {})) f.attributes[k] = v;
-      for (const [k, v] of Object.entries(n.variants ?? {})) f.variants[k] = { ...f.variants[k], ...v };
-      for (const [k, v] of Object.entries(n.variantSelection ?? {})) f.variantSelection[k] = v;
-      for (const [k, v] of Object.entries(n.payloads ?? {})) f.payloads[k] = v;
+      for (const [k, v] of Object.entries(field('inherits') ?? {})) {
+        if (v === null) { delete f.inherits[k]; continue; }
+        if (typeof v !== 'string') {
+          ignore(`Ignored invalid reference "${n.path}" inherits.${k}`);
+          continue;
+        }
+        f.inherits[k] = v;
+      }
+      for (const [k, v] of Object.entries(field('attributes') ?? {})) f.attributes[k] = v;
+      for (const [k, v] of Object.entries(field('variants') ?? {})) f.variants[k] = { ...f.variants[k], ...(v as Record<string, string>) };
+      for (const [k, v] of Object.entries(field('variantSelection') ?? {})) f.variantSelection[k] = v as string;
+      for (const [k, v] of Object.entries(field('payloads') ?? {})) f.payloads[k] = v as FlatNode['payloads'][string];
     }
   }
+  if (withoutPath) ignore(`Ignored ${withoutPath} ${withoutPath === 1 ? 'node' : 'nodes'} without a valid path`);
   return out;
 }
 

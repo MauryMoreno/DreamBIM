@@ -14,6 +14,8 @@ export function packMeshes(file: IfcxFile): ArrayBuffer[] {
     const m = node.attributes?.[MESH] as Record<string, any> | undefined;
     if (!m || !Array.isArray(m.points)) continue;
     const pts = m.points as number[][];
+    // a ragged point cannot be packed: leave the mesh as it is and report it when drawn
+    if (!pts.every((p) => Array.isArray(p) && p.length >= 3)) continue;
     const flat = new Float32Array(pts.length * 3);
     for (let i = 0, o = 0; i < pts.length; i++) {
       const p = pts[i];
