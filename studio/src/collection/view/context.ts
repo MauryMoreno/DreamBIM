@@ -1,0 +1,53 @@
+import { CollectionCallbacks, CollectionDeps, Collection } from './types';
+import type { LibraryEntry } from '../../library/librarypanel';
+import type { CardInfo } from '../cardinfo';
+import type { Indexer } from '../indexer';
+import { type CardRecord } from '../store';
+
+/** What the parts of mountCollection share: its parameters and every local that more than one part uses. */
+export interface CollectionContext {
+  host: HTMLElement;
+  cb: CollectionCallbacks;
+  deps: CollectionDeps;
+  disc: HTMLSelectElement;
+  cls: HTMLSelectElement;
+  search: HTMLInputElement;
+  progress: HTMLSpanElement;
+  pick: HTMLButtonElement;
+  count: HTMLSpanElement;
+  grid: HTMLDivElement;
+  empty: HTMLDivElement;
+  emptyText: HTMLSpanElement;
+  choose: HTMLButtonElement;
+  prev: HTMLButtonElement;
+  next: HTMLButtonElement;
+  pageText: HTMLSpanElement;
+  pager: HTMLElement;
+  pageSize: number;
+  page: number;
+  root: string | null;
+  files: LibraryEntry[];
+  error: string | null;
+  complete: boolean;
+  query: string;
+  records: Map<string, CardRecord>;
+  entries: Map<string, LibraryEntry>;
+  numbers: Map<string, number>;
+  cards: Map<string, HTMLElement>;
+  ticket: number;
+  wanted: Set<string>;
+  active: boolean;
+  setThumb: (path: string, url: string) => void;
+  requestThumb: (path: string) => void;
+  observer: IntersectionObserver | null;
+  cardFor: (path: string) => HTMLElement | null;
+  statMax: () => CardInfo["dims"];
+  render: () => void;
+  indexer: Indexer;
+  firstPage: () => void;
+  canPlace: boolean;
+  closeLarge: (() => void) | null;
+  openLarge: (path: string) => void;
+  placeSync: (() => void) | null;
+  col: Collection;
+}

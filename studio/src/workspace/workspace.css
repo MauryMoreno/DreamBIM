@@ -1,0 +1,880 @@
+/* Workspace (sketch B): ribbon, left column with two panels, central view and status bar. */
+.ws {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--app-bg);
+}
+
+.ws-ribbon {
+  flex: none;
+}
+
+.ws-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/* Left + center on top and the Library below, across the full width of both */
+.ws-stack {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ws-upper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/* Left column: Properties on top, Browser below */
+.ws-left {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* BuiltBot inside the Assistant column */
+.bb-column {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.bb-frame {
+  flex: 1;
+  width: 100%;
+  border: 0;
+}
+.bb-missing {
+  margin: 12px;
+  color: var(--text-muted);
+}
+
+/* Assistant column, at the far right; collapsed until it is opened */
+.ws-assistant {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-right: 0;
+  background: var(--panel-bg);
+}
+.ws-assistant[hidden],
+.splitter[hidden] {
+  display: none;
+}
+
+.ws-right.is-collapsed,
+.ws-assistant.is-collapsed {
+  border: 0;
+}
+.ws-rail-right {
+  border-left: 1px solid var(--border);
+}
+.ws-rail-bottom {
+  border-top: 1px solid var(--border);
+}
+
+/* Right column: Stage | Layer tabs and, at the bottom, the Move box */
+.ws-right {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-right: 0;
+  background: var(--panel-bg);
+}
+
+.ws-ctabs {
+  flex: none;
+  display: flex;
+  background: var(--panel-header-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.ws-ctab {
+  padding: 4px 12px;
+  border: 0;
+  border-right: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ws-ctab:hover {
+  color: var(--text);
+  background: var(--hover-bg);
+}
+
+.ws-ctab[aria-selected="true"] {
+  color: var(--text);
+  background: var(--panel-bg);
+  box-shadow: inset 0 2px 0 var(--accent);
+}
+
+.ws-ctab:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.ws-cpanel {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ws-cpanel[hidden],
+.ws-move[hidden] {
+  display: none;
+}
+
+.ws-move {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ws-move:has(> :not([hidden])) {
+  border-top: 1px solid var(--border);
+}
+
+/* when closed or folded, the box returns to its natural height (the splitter's stays for when it opens) */
+.ws-move:not(:has(> .movebox:not([hidden]))),
+.ws-move:has(> .movebox.is-collapsed) {
+  flex: none !important;
+}
+
+.ws-right:not(:has(> .ws-move > .movebox:not([hidden]))) > .ws-move-split,
+.ws-right:has(> .ws-move > .movebox.is-collapsed) > .ws-move-split {
+  display: none;
+}
+
+.ws-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-left: 0;
+  background: var(--panel-bg);
+}
+
+.ws-props {
+  flex: 0 0 45%;
+}
+
+.ws-browser {
+  flex: 1 1 0;
+}
+
+.ws-panel-title {
+  flex: none;
+  height: 22px;
+  line-height: 22px;
+  padding: 0 8px;
+  background: var(--panel-header-bg);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ws-panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Properties is the panel body itself (the same element): without this, the overflow: hidden above, when loading
+   after properties.css, removed its scroll bar */
+.ws-panel-body.props {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.ws-panel-body > .props,
+.ws-panel-body > .pb {
+  border-left: 0;
+  border-right: 0;
+}
+
+/* Splitters */
+.splitter {
+  flex: none;
+  background: var(--app-bg);
+  outline: none;
+}
+
+.splitter-v {
+  width: 5px;
+  cursor: col-resize;
+}
+
+.splitter-h {
+  height: 5px;
+  cursor: row-resize;
+}
+
+.splitter:hover,
+.splitter.dragging,
+.splitter:focus-visible {
+  background: var(--selection);
+}
+
+/* Center: tabs, view and view control bar */
+.ws-center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+}
+
+.ws-tabs {
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 26px;
+  padding: 0 4px;
+  background: var(--panel-header-bg);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.ws-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 220px;
+  height: 23px;
+  padding: 0 4px 0 8px;
+  background: var(--tab-bg);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  cursor: default;
+  outline: none;
+}
+
+.ws-tab:hover {
+  background: var(--tab-hover-bg);
+}
+
+.ws-tab.active {
+  background: var(--tab-active-bg);
+  height: 25px;
+  margin-bottom: -1px;
+}
+
+.ws-tab:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.ws-tab .icon {
+  flex: none;
+  color: var(--text-muted);
+}
+
+.ws-tab-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ws-tab-close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.ws-tab-close:hover {
+  background: var(--tab-close-hover-bg);
+  color: var(--text);
+}
+
+.ws-view {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: var(--view-bg);
+  overflow: hidden;
+}
+
+.ws-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.ws-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.ws-noview {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--panel-bg);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.ws-view.no-view .ws-noview {
+  display: flex;
+}
+
+.ws-view.no-view .ws-canvas,
+.ws-view.no-view .viewcube {
+  visibility: hidden;
+}
+
+.ws-viewbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 24px;
+  padding: 0 6px;
+  background: var(--ribbon-bg);
+  border-top: 1px solid var(--border);
+}
+
+.ws-scale {
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.ws-vb-sep {
+  width: 1px;
+  height: 16px;
+  margin: 0 4px;
+  background: var(--border);
+}
+
+.ws-vb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+}
+
+.ws-vb-btn:hover:not(:disabled) {
+  border-color: var(--border);
+  background: var(--card-bg);
+}
+
+.ws-vb-btn.pressed {
+  border-color: var(--accent);
+  background: var(--selection);
+}
+
+.ws-vb-btn:disabled {
+  opacity: 0.4;
+}
+
+.ws-vb-btn:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* Status bar */
+.ws-status {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 22px;
+  padding: 0 8px;
+  background: var(--panel-header-bg);
+  border-top: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.ws-status-msg {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ws-status-level {
+  flex: none;
+  color: var(--text-muted);
+}
+
+/* ViewCube: top right of the view */
+.viewcube {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 124px;
+  height: 150px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.viewcube-home {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--cube-home-fg);
+  pointer-events: auto;
+}
+
+.viewcube-home:hover {
+  border-color: var(--border);
+  background: var(--cube-home-hover-bg);
+}
+
+/* Centered in the box; the soft perspective gives the look of a physical cube */
+.viewcube-stage {
+  position: absolute;
+  top: 55px;
+  left: 37px;
+  width: 50px;
+  height: 50px;
+  perspective: 360px;
+}
+
+.viewcube-cube {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  transform-style: preserve-3d;
+}
+
+.viewcube-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+/* 3×3 grid: edges and vertices in the bands, the face in the center */
+  display: grid;
+  grid-template: 11px 1fr 11px / 11px 1fr 11px;
+  width: 50px;
+  height: 50px;
+  background: var(--cube-face-bg);
+  border: 1px solid var(--cube-face-border);
+  backface-visibility: hidden;
+}
+
+.viewcube-cell {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.viewcube-cell.hot {
+  background: var(--cube-face-hover-bg);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+/* Face label; it does not cover the cells */
+.viewcube-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cube-face-fg);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
+/* The center cell (5th) is the whole face */
+.viewcube-cell:nth-child(5).hot ~ .viewcube-label {
+  color: var(--cube-face-hover-fg);
+}
+
+/* Shading based on the light, computed in viewcube.ts (--shade) */
+.viewcube-face::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: var(--cube-shade);
+  opacity: var(--shade, 0);
+  pointer-events: none;
+}
+
+/* Compass: smooth ring at the base of the cube; the band is the border */
+.viewcube-ring {
+  position: absolute;
+  top: -33px;
+  left: -33px;
+  box-sizing: border-box;
+  width: 116px;
+  height: 116px;
+  border: 16px solid var(--cube-ring);
+  border-radius: 50%;
+}
+
+.viewcube-compass {
+  position: absolute;
+  padding: 2px 3px;
+  color: var(--cube-compass-fg);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.viewcube-compass:hover {
+  color: var(--cube-compass-hover-fg);
+}
+
+/* Each letter at the center of the band (8 px outside the inner border), with its head towards the cube */
+.viewcube-compass[data-dir='N'] {
+  top: -8px;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.viewcube-compass[data-dir='S'] {
+  bottom: -8px;
+  left: 50%;
+  transform: translate(-50%, 50%);
+}
+
+.viewcube-compass[data-dir='E'] {
+  top: 50%;
+  right: -8px;
+  transform: translate(50%, -50%) rotate(-90deg);
+}
+
+.viewcube-compass[data-dir='W'] {
+  top: 50%;
+  left: -8px;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+/* 90° rotation arrows: only when facing a face */
+.viewcube-arrow {
+  position: absolute;
+  display: none;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--cube-home-fg);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.viewcube.face-on .viewcube-arrow {
+  display: block;
+}
+
+.viewcube-arrow::before {
+  content: '';
+  position: absolute;
+  inset: 3px 2px;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.viewcube-arrow:hover {
+  color: var(--accent);
+}
+
+/* Cube center in the box: (62, 80); the arrows 36 px from the center */
+.viewcube-arrow[data-dir='up'] {
+  top: 37px;
+  left: 55px;
+}
+
+.viewcube-arrow[data-dir='down'] {
+  top: 109px;
+  left: 55px;
+  transform: rotate(180deg);
+}
+
+.viewcube-arrow[data-dir='left'] {
+  top: 73px;
+  left: 19px;
+  transform: rotate(-90deg);
+}
+
+.viewcube-arrow[data-dir='right'] {
+  top: 73px;
+  left: 91px;
+  transform: rotate(90deg);
+}
+
+/* Levels in the 3D view: head and label over the canvas (the lines are in the scene). */
+.ws-level-overlay {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.level-head,
+.level-label {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+}
+
+.level-head {
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border: 1.5px solid var(--level-line);
+  border-radius: 50%;
+  background: var(--level-label-bg);
+}
+
+.level-label {
+  transform: translateY(-50%);
+  padding: 0 4px;
+  border-radius: var(--radius);
+  background: var(--level-label-bg);
+  color: var(--level-label-fg);
+  font: var(--font-size) / 1.3 var(--font);
+  white-space: nowrap;
+}
+
+.level-head.selected {
+  border-color: var(--accent);
+}
+
+.level-label.selected {
+  outline: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+/* Elevation ruler below the ViewCube (clicking a level selects it): meter numbers to the left of the axis (at 40 px),
+   levels on the right with their names; the exact elevation appears on hover. The height is set by the code. */
+.level-list {
+  position: absolute;
+  top: 160px;
+  right: 6px;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 140px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: transparent; /* over the view: only the ruler and the texts */
+  color: var(--level-label-fg);
+  font: 11px / 14px var(--font);
+  text-shadow: 0 0 2px var(--level-label-bg), 0 0 2px var(--level-label-bg); /* halo to read it over the model */
+  pointer-events: none;
+  user-select: none;
+}
+
+.level-list[hidden] {
+  display: none;
+}
+
+.ws-view.no-view .level-list {
+  visibility: hidden;
+}
+
+/* vertical axis */
+.level-list::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 40px;
+  width: 1px;
+  background: var(--level-line);
+}
+
+/* meter ticks: short without a number, long with one */
+.level-tick {
+  position: absolute;
+  left: 0;
+  width: 36px;
+  height: 14px;
+  margin-top: -7px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.level-tick::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 36px;
+  width: 4px;
+  border-top: 1px solid var(--level-line);
+}
+
+.level-tick.major::after {
+  left: 32px;
+  width: 8px;
+}
+
+.level-tick.major {
+  padding-right: 6px;
+  box-sizing: border-box;
+}
+
+/* level: long tick on the axis at its elevation and its name on the right */
+.level-item {
+  position: absolute;
+  left: 36px;
+  right: 0;
+  height: 14px;
+  margin-top: -7px;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.level-item::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 20px;
+  margin-top: -1px;
+  border-top: 2px solid var(--level-line);
+}
+
+.level-item-name {
+  position: absolute;
+  left: 24px;
+  right: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.level-item.active::before {
+  border-top-color: var(--accent);
+}
+
+.level-item.active .level-item-name {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* exact elevation: appears on hover, to the left of the ruler */
+.level-item-z {
+  display: none;
+  position: absolute;
+  top: -2px;
+  right: calc(100% + 42px);
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--level-label-bg);
+  box-shadow: var(--shadow-menu);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.level-item:hover .level-item-z {
+  display: block;
+}
+
+.level-item:hover::before {
+  border-top-color: var(--accent);
+}
+
+/* Options Bar of the Wall tool: under the ribbon, only while drawing */
+.ws-optionsbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 26px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-header-bg);
+  color: var(--text);
+  font: var(--font-size) / 1 var(--font);
+}
+
+.ws-optionsbar[hidden] {
+  display: none;
+}
+
+.ws-optionsbar-title {
+  padding-right: 16px;
+  border-right: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.ws-optionsbar-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ws-optionsbar-check input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+/* Crosshair cursor while the Wall tool is active */
+.ws-canvas.drawing,
+.ws-canvas.drawing canvas {
+  cursor: crosshair;
+}
+
+/* "Assistant colors" chip: there are temporary Assistant colors in the view */
+.ws-assistant-colors {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 5;
+  padding: 3px 10px;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  background: var(--panel-bg);
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
+.ws-assistant-colors:hover {
+  background: var(--accent-hover-bg);
+}

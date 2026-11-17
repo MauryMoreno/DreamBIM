@@ -1,0 +1,1254 @@
+/* Paneles del modo Schedule: Gantt, Task, fases y barra de fecha */
+.sch-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.sch-toolbar {
+  display: flex;
+  gap: 4px;
+}
+
+.sch-btn {
+  min-width: 26px;
+  padding: 1px 8px;
+  border: 1px solid var(--border);
+  background: var(--chip-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.sch-btn:hover:not(:disabled) {
+  background: var(--accent-hover-bg);
+  border-color: var(--accent-hover-border);
+}
+
+.sch-btn:disabled {
+  color: var(--text-disabled);
+}
+
+.sch-btn[aria-pressed='true'] {
+  background: var(--selection);
+}
+
+.sch-split {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.sch-list {
+  flex: none;
+  width: 560px;
+  border-collapse: collapse;
+  align-self: flex-start;
+}
+
+/* Alto de fila = ROW de gantt.ts (24 px, borde incluido) y cabecera = .sch-scale (48 px): si no, las barras se
+   desfasan del listado un píxel por fila. */
+.sch-list th,
+.sch-list td {
+  box-sizing: border-box;
+  height: 24px;
+  padding: 0 6px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sch-list thead th {
+  /* fija al bajar: el panel (.sch-split) es el que hace scroll */
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: 48px;
+  background: var(--panel-header-bg);
+}
+
+.sch-phase th {
+  background: var(--chip-bg);
+}
+
+.sch-row[aria-selected='true'] {
+  background: var(--selection);
+}
+
+.sch-row.is-marked {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.sch-num {
+  text-align: right;
+}
+
+.sch-missing {
+  margin-left: 6px;
+  color: var(--danger-fg);
+}
+
+.sch-chart {
+  position: relative;
+  flex: 1;
+  /* as tall as its rows, like the list: if stretched to the visible height, it gets cut when scrolling down */
+  align-self: flex-start;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* its bar would end up at the end of the rows: the one of .sch-hscroll is used, fixed under the panel */
+  scrollbar-width: none;
+}
+
+.sch-chart::-webkit-scrollbar {
+  display: none;
+}
+
+.sch-hscroll {
+  flex: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-top: 1px solid var(--border);
+}
+
+.sch-hscroll-inner {
+  height: 1px;
+}
+
+/* Gantt header: the title and, at the top right, the icon to enlarge */
+.sch-gantt-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sch-gantt-title-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sch-body {
+  position: relative;
+}
+
+/* it floats over the scale of the timeline, top right, to the left of the vertical scroll */
+.sch-expand {
+  position: absolute;
+  top: 8px;
+  right: 22px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  width: 34px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-header-bg);
+  box-shadow: var(--shadow-toast);
+  color: var(--text);
+}
+
+.sch-expand:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.sch-expand svg {
+  width: 22px;
+  height: 22px;
+}
+
+.sch-scale {
+  /* fija al bajar: gantt.ts la desplaza con el scroll del panel (sticky no sirve: .sch-chart hace scroll horizontal) */
+  position: relative;
+  z-index: 3;
+  height: 48px;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-header-bg);
+}
+
+.sch-day {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  border-left: 1px solid var(--border);
+  font-size: 0.8em;
+  text-align: center;
+}
+
+.sch-day.is-off {
+  background: var(--chip-bg);
+}
+
+/* months strip, on top: one cell per month */
+.sch-month {
+  position: absolute;
+  top: 0;
+  height: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-left: 1px solid var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2px;
+  text-align: center;
+  background: var(--panel-header-bg);
+  font-weight: 600;
+  line-height: 15px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* weeks strip, between the month and the days: one cell per ISO week, from Monday to Sunday */
+.sch-wk {
+  position: absolute;
+  top: 16px;
+  height: 15px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-left: 1px solid var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1px;
+  text-align: center;
+  background: var(--panel-header-bg);
+  font-size: 0.8em;
+  line-height: 15px;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+.sch-daynum {
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  right: 0;
+  color: var(--text-muted);
+}
+
+.sch-bars {
+  position: relative;
+}
+
+.sch-links {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+
+.sch-dayline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 2px solid var(--danger-fg);
+  pointer-events: none;
+}
+
+/* red line indicator: a label with the date on the scale, which is grabbed to move the day */
+.sch-dayhandle {
+  position: absolute;
+  top: 32px; /* en la fila de los días, justo sobre el arranque de la línea roja */
+  z-index: 4;
+  box-sizing: border-box;
+  height: 14px;
+  padding: 0 7px;
+  transform: translateX(-50%);
+  border-radius: 7px;
+  background: var(--danger-fg);
+  box-shadow: var(--shadow-toast);
+  color: var(--accent-fg);
+  font-size: 0.7em;
+  font-weight: 600;
+  line-height: 14px;
+  white-space: nowrap;
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.sch-dayhandle:hover,
+.sch-dayhandle.is-dragging {
+  filter: brightness(1.15);
+  outline: 2px solid color-mix(in srgb, var(--danger-fg) 45%, transparent);
+}
+
+.sch-dayhandle[hidden] {
+  display: none;
+}
+
+.sch-bar {
+  position: absolute;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--accent);
+  background: var(--accent-hover-bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+.sch-gantt.is-readonly .sch-bar {
+  cursor: default;
+}
+
+.sch-bar.is-selected {
+  background: var(--accent-solid);
+  color: var(--accent-fg);
+}
+
+.sch-bar.is-marked {
+  outline: 2px solid var(--accent);
+}
+
+.sch-id {
+  color: var(--text-muted);
+}
+
+.sch-pred {
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* critical path (Critical Path button): in red, and the rest dimmed so it stands out */
+.show-critical .sch-row.is-critical {
+  box-shadow: inset 3px 0 0 var(--danger-fg);
+  background: color-mix(in srgb, var(--danger-fg) 10%, transparent);
+}
+
+.show-critical .sch-row.is-critical .sch-name,
+.show-critical .sch-row.is-critical .sch-float {
+  color: var(--danger-fg);
+  font-weight: 600;
+}
+
+.show-critical .sch-row:not(.is-critical) td {
+  opacity: 0.6;
+}
+
+.show-critical .sch-bar:not(.is-critical) {
+  opacity: 0.35;
+}
+
+.show-critical .sch-links path:not(.is-critical) {
+  opacity: 0.3;
+}
+
+/* avance: relleno dentro de la barra */
+.sch-progress {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--accent-solid);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.show-critical .sch-bar.is-critical {
+  border: 2px solid var(--danger-fg);
+  background: color-mix(in srgb, var(--danger-fg) 70%, transparent);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--danger-fg) 60%, transparent);
+}
+
+.show-critical .sch-bar.is-critical .sch-progress {
+  background: var(--danger-fg);
+}
+
+.show-critical .sch-links path.is-critical {
+  stroke: var(--danger-fg);
+  stroke-width: 2;
+}
+
+.sch-links polygon {
+  fill: var(--text-muted);
+  stroke: none;
+}
+
+.show-critical .sch-links polygon.is-critical {
+  fill: var(--danger-fg);
+}
+
+/* tipo de tarea (4D como Bexel) */
+.sch-bar.is-demolish {
+  border-color: var(--danger-fg);
+  border-style: dashed;
+}
+
+.sch-bar.is-temporary {
+  border-style: dashed;
+}
+
+/* milestone: a diamond one day wide, with the name to its right */
+.sch-bar.is-milestone {
+  overflow: visible;
+  border: none;
+  background: none;
+}
+
+.sch-bar.is-milestone::before {
+  content: '';
+  position: absolute;
+  top: calc(50% - 6px);
+  left: calc(50% - 7px);
+  width: 12px;
+  height: 12px;
+  background: var(--text);
+  transform: rotate(45deg);
+}
+
+.show-critical .sch-bar.is-milestone.is-critical {
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.show-critical .sch-bar.is-milestone.is-critical::before {
+  background: var(--danger-fg);
+  box-shadow: 0 0 6px var(--danger-fg);
+}
+
+/* phase summary as in MS Project: a black bar with a triangular point downwards at each end */
+.sch-summary {
+  position: absolute;
+  height: 7px;
+  background: var(--text);
+  pointer-events: none;
+}
+
+.sch-summary::before,
+.sch-summary::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  width: 0;
+  height: 0;
+  border-top: 6px solid var(--text);
+}
+
+.sch-summary::before {
+  left: 0;
+  border-right: 6px solid transparent;
+}
+
+.sch-summary::after {
+  right: 0;
+  border-left: 6px solid transparent;
+}
+
+/* baseline: a thin grey bar under the task */
+.sch-baseline {
+  position: absolute;
+  height: 4px;
+  background: var(--text-muted);
+  opacity: 0.6;
+  border-radius: 1px;
+}
+
+.sch-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: ew-resize;
+}
+
+.sch-empty {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.sch-host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sch-btn:focus-visible,
+.sch-row:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.sch-task-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px;
+  overflow: auto;
+}
+
+.sch-fields {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  margin: 0;
+}
+
+.sch-fields dt,
+.sch-path {
+  color: var(--text-muted);
+}
+
+.sch-fields dd {
+  margin: 0;
+}
+
+.sch-element-tasks {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.sch-warn {
+  margin: 0;
+  color: var(--danger-fg);
+}
+
+.sch-curve {
+  width: 100%;
+  height: auto;
+}
+
+.sch-week {
+  fill: var(--accent-hover-border);
+}
+
+.sch-cum {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.sch-curve-day {
+  stroke: var(--danger-fg);
+}
+
+.sch-curve-text {
+  margin: 0;
+}
+
+/* 4D date bar: in the view bar, after the visual style; Play and the timeline with the rest of the width */
+.sch-datebar {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+/* in schedule mode the view bar grows as much as the timeline asks */
+.ws-viewbar:has(.sch-datebar:not([hidden])) {
+  height: auto;
+  min-height: 24px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.sch-datebar[hidden] {
+  display: none;
+}
+
+/* la fecha, sobre el modelo, abajo a la izquierda */
+.sch-date-overlay {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--ribbon-bg) 82%, transparent);
+  box-shadow: var(--shadow-toast);
+  pointer-events: none;
+}
+
+.sch-date-overlay[hidden] {
+  display: none;
+}
+
+.sch-date-overlay .sch-date {
+  min-width: 0;
+  font-size: 1.15em;
+  font-weight: 600;
+}
+
+.sch-datebar-progress {
+  color: var(--text-muted);
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+/* accessible slider: it is still in the DOM (keyboard, readers) but what is seen and dragged is the timeline */
+.sch-range {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+/* 4D timeline: years above and months below; what has passed is tinted with the accent and the day is a red head */
+.sch-tl {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input-bg);
+  box-shadow: inset 0 1px 2px var(--border);
+  cursor: ew-resize;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+
+.sch-tl:hover {
+  border-color: var(--accent);
+}
+
+.sch-tl.is-disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.sch-tl.is-disabled:hover {
+  border-color: var(--border);
+}
+
+.sch-tl-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent-solid) 35%, transparent), color-mix(in srgb, var(--accent-solid) 75%, transparent));
+  pointer-events: none;
+}
+
+.sch-tl-year,
+.sch-tl-month {
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.sch-tl-year {
+  top: 0;
+  height: 15px;
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel-header-bg) 70%, transparent);
+  color: var(--text);
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 14px;
+}
+
+.sch-tl-month {
+  top: 15px;
+  bottom: 0;
+  border-left: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  color: var(--text);
+  font-size: 0.78em;
+  line-height: 20px;
+  opacity: 0.85;
+}
+
+/* the first month of the year marks the cut with the same line as the years */
+.sch-tl-month.is-year-start {
+  border-left-color: var(--border);
+}
+
+.sch-tl-today {
+  position: absolute;
+  top: 15px;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--text-muted);
+  pointer-events: none;
+}
+
+.sch-tl-cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--danger-fg);
+  box-shadow: 0 0 4px color-mix(in srgb, var(--danger-fg) 70%, transparent);
+  pointer-events: none;
+}
+
+/* head: a point downwards at the top of the marker */
+.sch-tl-cursor::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -4px;
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
+  border-top: 7px solid var(--danger-fg);
+}
+
+.sch-tl-cursor[hidden] {
+  display: none;
+}
+
+.sch-date {
+  min-width: 13ch;
+  white-space: nowrap;
+}
+
+.sch-calendar-dialog {
+  min-width: 340px;
+}
+
+/* task dialog: wide for two columns, never taller than the window, with the body scrolling */
+.sch-task-dialog {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 620px;
+  max-width: 94vw;
+  max-height: 90vh;
+}
+
+.sch-task-form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  padding: 10px 14px;
+  overflow-y: auto;
+}
+
+.sch-section {
+  margin-top: 2px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.8em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* six columns: a field takes half a row by default, a third (is-third) or the whole row (is-wide) */
+.sch-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px 12px;
+}
+
+.sch-grid > .sch-field {
+  grid-column: span 3;
+}
+
+.sch-grid > .sch-field.is-third {
+  grid-column: span 2;
+}
+
+.sch-grid > .sch-field.is-wide {
+  grid-column: 1 / -1;
+}
+
+.sch-grid-3 > .sch-field {
+  grid-column: span 2;
+}
+
+.sch-task-foot {
+  flex: none;
+  border-top: 1px solid var(--border);
+  background: var(--panel-header-bg);
+}
+
+.sch-task-foot .sch-error {
+  min-height: 0;
+  padding: 4px 14px 0;
+}
+
+.sch-task-foot .modal-buttons {
+  padding-top: 10px;
+}
+
+.sch-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sch-field-label,
+.sch-note {
+  color: var(--text-muted);
+}
+
+.sch-field input,
+.sch-field select,
+.sch-holidays {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.sch-preds,
+.sch-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  border: 1px solid var(--border);
+}
+
+/* predecessors: a list with its own scroll and filter, so that 80 tasks do not stretch the dialog */
+.sch-task-dialog .sch-preds {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 4px;
+  min-width: 0;
+  padding: 6px 8px 8px;
+}
+
+.sch-pred-filter {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.sch-pred-filter[hidden],
+.sch-pred-row[hidden] {
+  display: none;
+}
+
+.sch-pred-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.sch-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sch-error {
+  min-height: 1.2em;
+  color: var(--error-fg);
+}
+
+/* task dialog: each predecessor with its link type and lag */
+.sch-pred-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sch-pred-row .sch-check {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sch-lag {
+  width: 56px;
+}
+
+/* enlarged timeline: a window with only the timeline; it stretches from the bottom right corner */
+.modal-scrim.sch-timeline-scrim {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.sch-timeline-dialog {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 94vw;
+  max-width: 100vw;
+  height: 86vh;
+  max-height: 100vh;
+  min-width: 420px;
+  min-height: 240px;
+  margin: 3vh 3vw;
+  overflow: hidden;
+  resize: both;
+}
+
+.sch-timeline-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sch-timeline-host {
+  flex: 1;
+  min-height: 0;
+}
+
+/* no list: the timeline takes the whole width */
+.sch-gantt.no-list .sch-list {
+  display: none;
+}
+
+.sch-timeline-foot {
+  display: flex;
+  gap: 16px;
+  padding: 3px 22px 3px 10px; /* a la derecha cabe el asa de tamaño */
+  border-top: 1px solid var(--border);
+  background: var(--panel-header-bg);
+  color: var(--text-muted);
+  font-size: 0.85em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* the focus of the hidden slider is seen on the timeline */
+.sch-datebar:focus-within .sch-tl {
+  outline: 1px solid var(--accent);
+}
+
+/* the modal already brings its title */
+.sch-timeline-host .ws-panel-title {
+  display: none;
+}
+
+/* the Gantt fills the height of the window even if its rows are low: the automatic fit measures that height */
+.sch-timeline-host > .sch-gantt {
+  flex: 1;
+  min-height: 0;
+}
+
+/* enlarged timeline: the timeline and, beside it, the activities touched by the red line */
+.sch-timeline-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.sch-timeline-body > .sch-timeline-host {
+  min-width: 0;
+}
+
+.sch-timeline-live {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 4px;
+  width: 260px;
+  box-sizing: border-box;
+  padding: 8px;
+  overflow: auto;
+  border-left: 1px solid var(--border);
+  background: var(--panel-bg);
+}
+
+.sch-live-title {
+  font-weight: 600;
+}
+
+.sch-live-sub {
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+
+.sch-live-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.sch-live-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--chip-bg);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sch-live-item:hover,
+.sch-live-item[aria-current='true'] {
+  background: var(--selection);
+}
+
+.sch-live-item.is-critical {
+  border-left-color: var(--danger-fg);
+}
+
+.sch-live-item.is-critical .sch-live-name {
+  color: var(--danger-fg);
+}
+
+.sch-live-name {
+  overflow-wrap: anywhere;
+}
+
+.sch-live-meta {
+  color: var(--text-muted);
+  font-size: 0.8em;
+}
+
+/* bars the day line crosses */
+.sch-bar.is-live {
+  z-index: 1;
+  outline: 1px solid var(--text);
+  filter: brightness(1.6) saturate(1.3);
+}
+
+/* deslizables de zoom de la barra de herramientas */
+.sch-slide {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sch-slide-glyph {
+  color: var(--text-muted);
+}
+
+.sch-slider {
+  width: 110px;
+  margin: 0;
+}
+
+/* elements of a task (Task panel and dialog): a title with its button and a scrolling list */
+.sch-elements {
+  margin-top: 8px;
+}
+
+.sch-elements-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.sch-elements-title {
+  font-weight: 600;
+}
+
+.sch-element-list {
+  max-height: 160px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  list-style: none;
+}
+
+.sch-element-list[hidden] {
+  display: none;
+}
+
+.sch-element-list > li {
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.sch-element-list > li:last-child {
+  border-bottom: 0;
+}
+
+.sch-element-item {
+  display: block;
+  width: 100%;
+  padding: 2px 8px;
+  overflow: hidden;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sch-element-item:hover {
+  background: var(--selection);
+}
+
+.sch-element-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 1px 4px 1px 8px;
+}
+
+.sch-element-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sch-element-remove {
+  flex: none;
+  padding: 0 6px;
+  line-height: 1.2;
+}
+
+/* choosing elements in the model: the dialog is compressed into a strip on top (like the range boxes of Excel) and
+   deja pasar los clics al modelo; lo demás de la ventana queda inerte y atenuado (ver pickshield.ts) */
+.modal-scrim.is-collapsed {
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 64px;
+  background: transparent;
+  pointer-events: none;
+}
+
+.sch-task-dialog.is-collapsed {
+  width: auto;
+  min-width: 380px;
+  max-height: none;
+  pointer-events: auto;
+  border-color: var(--accent);
+}
+
+.sch-task-dialog.is-collapsed .sch-task-form,
+.sch-task-dialog.is-collapsed .sch-task-foot {
+  display: none;
+}
+
+.sch-task-strip {
+  display: none;
+}
+
+.sch-task-dialog.is-collapsed .sch-task-strip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 10px 8px 14px;
+}
+
+.sch-task-strip-text {
+  flex: 1;
+}
+
+.sch-strip-done {
+  padding: 4px 16px;
+  border-color: var(--accent);
+  background: var(--accent-solid);
+  color: var(--accent-fg);
+}
+
+.is-pick-dim {
+  opacity: 0.4;
+  filter: grayscale(0.5);
+}
+
+/* Task panel with a chosen element: what it is and which tasks it belongs to */
+.sch-element-head {
+  margin-bottom: 6px;
+}
+
+.sch-element-title {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.sch-element-cls {
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+
+.sch-element-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sch-element-task {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--chip-bg);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sch-element-task:hover {
+  background: var(--selection);
+}
+
+.sch-element-task.is-critical {
+  border-left-color: var(--danger-fg);
+}
+
+.sch-toolbar[hidden] {
+  display: none;
+}
+
+/* the scale is clicked to take the red line to a month, a week or a day */
+.sch-scale.is-clickable .sch-day,
+.sch-scale.is-clickable .sch-month,
+.sch-scale.is-clickable .sch-wk {
+  cursor: pointer;
+}
+
+.sch-scale.is-clickable .sch-day:hover,
+.sch-scale.is-clickable .sch-month:hover,
+.sch-scale.is-clickable .sch-wk:hover {
+  background: var(--selection);
+}

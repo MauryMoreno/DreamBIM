@@ -1,0 +1,16 @@
+{
+  "source": "../Snowdon Towers Example",
+  "maxModelMB": 250,
+  "skipFolders": ["Microsoft", "__pycache__", "node_modules"],
+  "fullFolders": ["library"],
+  "models": [
+    "01_WIP/STR/PRJ-MMA-ZZ-ZZ-M3-S-0001.ifcx",
+    "01_WIP/MEP/PRJ-MMA-ZZ-ZZ-M3-E-0001.ifcx",
+    "01_WIP/ARCH/PRJ-MMA-ZZ-ZZ-M3-A-0001.test2.ifcx",
+    "01_WIP/ARCH/PRJ-MMA-ZZ-ZZ-M3-A-0001.ifcx",
+    "01_WIP/ARCH/PRJ-MMA-ZZ-ZZ-M3-A-0003.ifcx",
+    "01_WIP/FED/PRJ-MMA-ZZ-ZZ-M3-Z-0003.ifcx",
+    "01_WIP/FED/PRJ-MMA-ZZ-ZZ-M3-Z-0004.ifcx",
+    "01_WIP/FED/PRJ-MMA-ZZ-ZZ-M3-Z-0005.ifcx"
+  ]
+}

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <title>Dream BIM</title>
+    <!-- Theme before the first paint (see public/theme-boot.js). The background repeats --app-bg of tokens.css
+         only until the stylesheet loads. -->
+    <script src="./theme-boot.js"></script>
+    <style>
+      html { background: #ececec; }
+      html[data-theme="dark"] { background: #1f2329; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

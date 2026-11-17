@@ -1,0 +1,346 @@
+/* Ribbon and File menu (light theme, blue accent). */
+.ribbon {
+  position: relative;
+  flex: none;
+  background: var(--ribbon-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.ribbon-tabbar {
+  display: flex;
+  align-items: flex-end;
+  height: 26px;
+  padding-left: 0;
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.ribbon-tabs {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  padding-left: 4px;
+}
+
+.ribbon-tab {
+  height: 24px;
+  margin-bottom: -1px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: default;
+}
+
+.ribbon-tab:hover:not(.active) {
+  background: var(--hover-bg);
+}
+
+.ribbon-tab.active {
+  background: var(--ribbon-bg);
+  border-color: var(--border);
+  height: 26px;
+  font-weight: 600;
+}
+
+.ribbon-tab.contextual {
+  background: var(--contextual-bg);
+  border-color: var(--border);
+}
+
+.ribbon-btn[data-action='sketchFinish'] .icon {
+  color: var(--ok-fg);
+}
+
+.ribbon-btn[data-action='sketchCancel'] .icon {
+  color: var(--danger-fg);
+}
+
+.ribbon-tab:focus-visible,
+.ribbon-btn:focus-visible,
+.file-tab:focus-visible,
+.file-menu-item:focus-visible,
+.file-menu-recent:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.ribbon-body {
+  height: 94px;
+}
+
+.ribbon-panel {
+  display: flex;
+  height: 100%;
+  padding: 3px 4px 0;
+}
+
+.ribbon-panel[hidden] {
+  display: none;
+}
+
+.ribbon-group {
+  display: flex;
+  flex-direction: column;
+  padding: 0 4px;
+  border-right: 1px solid var(--border);
+}
+
+.ribbon-group-buttons {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 1px;
+  min-height: 0;
+}
+
+.ribbon-group-label {
+  flex: none;
+  padding: 2px 6px 3px;
+  text-align: center;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.ribbon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  min-width: 52px;
+  max-width: 76px;
+  height: 100%;
+  padding: 5px 5px 2px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: center;
+  line-height: 1.15;
+  cursor: default;
+}
+
+.ribbon-btn .icon {
+  flex: none;
+  color: var(--accent);
+}
+
+.ribbon-btn:hover:not(:disabled) {
+  background: var(--accent-hover-bg);
+  border-color: var(--accent-hover-border);
+}
+
+.ribbon-btn:active:not(:disabled),
+.ribbon-btn.pressed {
+  background: var(--selection);
+  border-color: var(--accent);
+}
+
+.ribbon-btn:disabled {
+  color: var(--text-disabled);
+}
+
+.ribbon-btn:disabled .icon {
+  color: var(--icon-disabled);
+}
+
+/* "File" button: a blue tab to the left of the ribbon. */
+.file-tab {
+  align-self: stretch;
+  min-width: 72px;
+  padding: 0 16px;
+  border: 0;
+  background: var(--accent-solid);
+  color: var(--accent-fg);
+  font: inherit;
+  font-weight: 600;
+  cursor: default;
+}
+
+.file-tab:hover,
+.file-tab[aria-expanded="true"] {
+  background: var(--accent-solid-hover);
+}
+
+.file-tab:focus-visible {
+  outline-color: var(--accent-fg);
+}
+
+/* File menu */
+.file-menu {
+  position: fixed;
+  z-index: 900;
+  display: flex;
+  min-width: 480px;
+  min-height: 280px;
+  background: var(--ribbon-bg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-menu);
+}
+
+.file-menu[hidden] {
+  display: none;
+}
+
+.file-menu-commands {
+  display: flex;
+  flex-direction: column;
+  width: 190px;
+  padding: 6px 0;
+  background: var(--panel-bg);
+  border-right: 1px solid var(--border);
+}
+
+.file-menu-spacer {
+  flex: 1;
+}
+
+.file-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: default;
+}
+
+.file-menu-item .icon {
+  color: var(--accent);
+}
+
+.file-menu-item:hover:not(:disabled) {
+  background: var(--selection);
+}
+
+.file-menu-item:disabled {
+  color: var(--text-disabled);
+}
+
+.file-menu-item:disabled .icon {
+  color: var(--icon-disabled);
+}
+
+.file-menu-theme {
+  display: flex;
+  flex-direction: column;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.file-menu-subheading {
+  padding: 2px 14px 4px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.file-menu-theme .theme-radio {
+  padding: 5px 14px 5px 18px;
+}
+
+.file-menu-exit {
+  border-top: 1px solid var(--border);
+}
+
+.file-menu-recents {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0;
+}
+
+.file-menu-heading {
+  padding: 0 16px 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.file-menu-recent-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.file-menu-recent {
+  padding: 7px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+
+.file-menu-recent:hover {
+  background: var(--selection);
+}
+
+.file-menu-empty {
+  padding: 8px 16px;
+  color: var(--text-muted);
+}
+
+/* Dropdown menu of a ribbon button (e.g. Levels ▾) */
+.ribbon-menu {
+  position: fixed;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  padding: 4px 0;
+  background: var(--ribbon-bg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-menu);
+}
+
+.ribbon-tab[hidden] {
+  display: none;
+}
+
+/* Minimized ribbon: only the tabs remain and the body may peek out floating. */
+.ribbon-minimize {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: 26px;
+  height: 22px;
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+}
+.ribbon-minimize:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+.ribbon-minimize:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -2px;
+}
+.ribbon.is-minimized .ribbon-body {
+  display: none;
+}
+.ribbon.is-minimized.is-peek .ribbon-body {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  right: 0;
+  left: 0;
+  display: block;
+  background: var(--ribbon-bg);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-menu);
+}

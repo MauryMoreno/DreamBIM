@@ -1,0 +1,174 @@
+/* Guided tour: a spotlight over a real element and a card beside it. Neither blocks the app: the
+   spotlight lets clicks through, and the card sits under the modal dialogs (990) and the toasts. */
+.tour-spot {
+  position: fixed;
+  z-index: 980;
+  border-radius: calc(var(--radius) + 2px);
+  outline: 2px solid var(--accent);
+  box-shadow: 0 0 0 200vmax var(--scrim);
+  pointer-events: none;
+  transition:
+    left 0.18s ease,
+    top 0.18s ease,
+    width 0.18s ease,
+    height 0.18s ease;
+}
+
+.tour-card {
+  position: fixed;
+  z-index: 981;
+  width: min(340px, calc(100vw - 16px));
+  background: var(--ribbon-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-menu);
+  transition:
+    left 0.18s ease,
+    top 0.18s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-spot,
+  .tour-card {
+    transition: none;
+  }
+}
+
+.tour-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 0 14px;
+  color: var(--text-muted);
+}
+
+.tour-close,
+.tour-skip {
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  padding: 2px 6px;
+  border-radius: var(--radius);
+}
+
+.tour-close:hover,
+.tour-skip:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+
+.tour-close:focus-visible,
+.tour-skip:focus-visible,
+.tour-chapter:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.tour-title {
+  margin: 2px 14px 6px;
+  font-size: 1.25em;
+}
+
+.tour-text {
+  margin: 0 14px 8px;
+  line-height: 1.45;
+}
+
+.tour-task {
+  margin: 4px 14px 10px;
+  padding: 6px 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-hover-bg);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.tour-task-done {
+  border-left-color: var(--ok-fg);
+  color: var(--ok-fg);
+}
+
+.tour-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+}
+
+.tour-skip {
+  margin-right: auto;
+}
+
+/* Chapter list */
+.modal.tour-menu {
+  width: min(460px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+}
+
+.tour-menu-intro {
+  margin: 0;
+  padding: 14px 14px 6px;
+  line-height: 1.45;
+}
+
+.tour-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px 10px;
+  overflow-y: auto;
+}
+
+.tour-chapter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+}
+
+.tour-chapter:hover {
+  background: var(--hover-bg);
+}
+
+.tour-chapter-mark {
+  flex: 0 0 22px;
+  height: 22px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.tour-chapter-done .tour-chapter-mark {
+  border-color: var(--ok-fg);
+  color: var(--ok-fg);
+}
+
+.tour-chapter-words {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.tour-chapter-title {
+  font-weight: 600;
+}
+
+.tour-chapter-summary {
+  color: var(--text-muted);
+}

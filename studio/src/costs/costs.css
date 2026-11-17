@@ -1,0 +1,924 @@
+/* Panels of Costs mode: BOQ and Cost, and the item dialog */
+
+.cost-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px;
+  overflow: auto;
+}
+
+.cost-field input[type='text'],
+.cost-field select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.cost-path {
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cost-row:hover {
+  background: var(--hover-bg);
+}
+
+.cost-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cost-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cost-table th,
+.cost-table td {
+  padding: 2px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.cost-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--panel-header-bg);
+}
+
+.cost-table td.cost-num,
+.cost-table .cost-total td,
+.cost-table .cost-chapter td {
+  text-align: right;
+}
+
+.cost-chapter th,
+.cost-chapter td,
+.cost-total th,
+.cost-total td {
+  font-weight: 600;
+  background: var(--chip-bg);
+}
+
+/* Elements that fell into no item: a row that can be clicked to see them */
+
+.cost-unassigned {
+  cursor: pointer;
+}
+
+.cost-unassigned th,
+.cost-unassigned td {
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+/* Where the price of the item comes from (reference or by hand) */
+
+.cost-price-status {
+  color: var(--text-muted);
+  font-size: 0.9em;
+}
+
+.cost-row[aria-selected='true'] {
+  background: var(--selection);
+}
+
+.cost-row.is-marked {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.cost-warn {
+  color: var(--text-muted);
+  font-size: 0.9em;
+}
+
+.cost-empty {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.cost-measures {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  margin: 0;
+}
+
+.cost-measures dt {
+  color: var(--text-muted);
+}
+
+.cost-measures dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cost-share-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cost-share-total {
+  font-weight: 600;
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+}
+
+.cost-item-dialog {
+  min-width: 340px;
+}
+
+.cost-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cost-field-label {
+  color: var(--text-muted);
+}
+
+.cost-error {
+  color: var(--error-fg);
+  min-height: 1.2em;
+}
+
+/* Contenedor de un panel del modo dentro de su hueco */
+
+.cost-host {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.cost-row:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.cost-group th {
+  text-align: left;
+}
+
+.cost-host[hidden] {
+  display: none;
+}
+
+/* Cost System: the cost IFCx as a tree (left panel) */
+.cost-tree-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cost-tree-title {
+  flex: 1;
+}
+
+.cost-tree-btn {
+  font: inherit;
+  font-size: 0.85em;
+  padding: 1px 6px;
+}
+
+.cost-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cost-tree-row:hover {
+  background: var(--chip-bg);
+}
+
+.cost-tree-row[aria-selected='true'] {
+  background: var(--selection);
+}
+
+.cost-tree-row:focus-visible {
+  outline: 2px solid var(--selection);
+  outline-offset: -2px;
+}
+
+.cost-tree-row.is-heading .cost-tree-code,
+.cost-tree-row.is-heading .cost-tree-name {
+  font-weight: 600;
+}
+
+.cost-tree-toggle,
+.cost-tree-leaf {
+  width: 14px;
+  flex: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+
+.cost-tree-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cost-tree-count {
+  color: var(--text-muted);
+  font-size: 0.85em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cost system editor (modal): a tree table */
+.cost-sys-dialog {
+  /* el modal de la app es estrecho (440 px): esta tabla necesita el ancho */
+  max-width: none;
+  width: min(1280px, 96vw);
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cost-sys-bar {
+  display: flex;
+  gap: 6px;
+}
+
+.cost-sys-search {
+  flex: 1;
+}
+
+.cost-sys-head,
+.cost-sys-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 190px) minmax(200px, 1.4fr) 80px 120px minmax(220px, 1fr) 26px 26px;
+  gap: 6px;
+  align-items: start;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.cost-sys-head {
+  padding-left: 6px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+
+/* the code with its collapse button; the indentation of the tree goes here */
+.cost-sys-codecell {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cost-sys-codecell .cost-sys-code {
+  flex: 1;
+  min-width: 0;
+}
+
+/* all the controls of a row with the same height, so the columns line up */
+.cost-sys-row input,
+.cost-sys-row select,
+.cost-sys-row button {
+  height: 26px;
+  box-sizing: border-box;
+}
+
+.cost-sys-toggle {
+  width: 16px;
+  flex: none;
+}
+
+.cost-sys-table {
+  overflow: auto;
+  min-height: 160px;
+  border: 1px solid var(--chip-bg);
+  border-radius: 4px;
+}
+
+/* la cabecera queda a la vista al desplazarse */
+.cost-sys-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  background: var(--chip-bg);
+}
+
+.cost-sys-row {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.cost-sys-row:hover {
+  background: var(--chip-bg);
+}
+
+.cost-sys-row input,
+.cost-sys-row select {
+  min-width: 0;
+  font: inherit;
+}
+
+.cost-sys-code[readonly] {
+  border-color: transparent;
+  background: none;
+}
+
+.cost-sys-toggle,
+.cost-sys-add,
+.cost-sys-del {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Document picker (recovered): choose a price in a quotation */
+/* elegir un valor de un documento: la rejilla de celdas, y un clic en la que se quiere */
+
+.doc-picker {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 1100px;
+  max-width: 96vw;
+  height: 80vh;
+  max-height: 92vh;
+}
+
+.doc-picker-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.doc-picker-bar .cost-search {
+  flex: 1;
+  margin: 0;
+}
+
+.doc-picker-bar select {
+  padding: 2px 4px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.doc-picker-name {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.doc-picker-body {
+  flex: 1;
+  min-height: 0;
+  padding: 6px 14px;
+  overflow: auto;
+}
+
+.doc-picker-paste {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.quote-paste {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 300px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.9em;
+}
+
+.doc-grid {
+  border-collapse: collapse;
+  /* the app does not allow selecting text; in the document it does, to choose any part */
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+  font-size: 0.9em;
+}
+
+.doc-grid th,
+.doc-grid td {
+  max-width: 420px;
+  padding: 2px 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-grid th,
+.doc-rowno {
+  background: var(--panel-header-bg);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.doc-cell {
+  color: var(--text-muted);
+}
+
+/* las hojas de un libro de Excel */
+
+.doc-picker-sheets {
+  display: flex;
+  gap: 2px;
+  padding: 6px 14px 0;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+}
+
+.doc-picker-sheets[hidden] {
+  display: none;
+}
+
+.doc-picker-sheet {
+  flex: none;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  background: var(--panel-header-bg);
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.doc-picker-sheet[aria-selected='true'] {
+  background: var(--selection);
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* a figure inside a cell with text (a Word paragraph, "12,50 USD/m²") */
+
+.doc-num.is-pickable {
+  padding: 0 2px;
+  border-bottom: 1px dashed var(--accent);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.doc-num.is-pickable:hover,
+.doc-num.is-pickable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+  background: var(--selection);
+}
+
+.doc-num.is-picked {
+  outline: 2px solid var(--accent);
+  font-weight: 600;
+}
+
+/* the text that was selected by hand for the price */
+
+.doc-sel.is-picked {
+  outline: 2px solid var(--accent);
+  background: var(--selection);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.doc-grid ::selection {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.doc-picker-use[hidden] {
+  display: none;
+}
+
+/* the Word paragraphs: long text is split into several lines */
+
+.doc-grid td.doc-cell {
+  white-space: pre-wrap;
+}
+
+.doc-cell.is-pickable {
+  color: var(--text);
+  cursor: pointer;
+}
+
+.doc-cell.is-pickable:hover,
+.doc-cell.is-pickable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  background: var(--selection);
+}
+
+/* the cell the price of this code was chosen from */
+
+.doc-row.is-picked-row > td {
+  background: var(--selection);
+}
+
+.doc-cell.is-picked,
+.doc-cell.is-picked:hover {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.doc-picker .sch-error {
+  min-height: 0;
+  padding: 0 14px;
+}
+
+.doc-picker-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--panel-header-bg);
+}
+
+.doc-picker-hint {
+  flex: 1;
+  color: var(--text-muted);
+}
+
+/* a Word document: it is seen as a document (a page with its paragraphs and tables), not as a grid */
+
+.doc-page {
+  box-sizing: border-box;
+  max-width: 820px;
+  margin: 8px auto 24px;
+  padding: 40px 56px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-box);
+  color: var(--text);
+  line-height: 1.55;
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+.doc-page ::selection {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.doc-par {
+  margin: 0 0 0.7em;
+  white-space: pre-wrap;
+}
+
+.doc-h1 {
+  margin-top: 0.4em;
+  font-size: 1.5em;
+  font-weight: 700;
+}
+
+.doc-h2 {
+  font-size: 1.25em;
+  font-weight: 700;
+}
+
+.doc-h3 {
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.doc-li {
+  position: relative;
+  padding-left: 1.4em;
+}
+
+.doc-li::before {
+  position: absolute;
+  left: 0.4em;
+  content: '•';
+  color: var(--text-muted);
+}
+
+/* the header and the footer, more discreet */
+
+.doc-page .doc-header,
+.doc-page .doc-footer {
+  color: var(--text-muted);
+  font-size: 0.9em;
+}
+
+.doc-page .doc-header:last-of-type {
+  margin-bottom: 1.4em;
+}
+
+.doc-table {
+  width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+}
+
+.doc-table td {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  vertical-align: top;
+  white-space: pre-wrap;
+}
+
+.doc-page .doc-cell.is-pickable:not(td) {
+  display: inline-block;
+}
+
+.doc-page .is-picked-row {
+  background: var(--selection);
+}
+
+/* a PDF: its pages drawn as they are and its text on top, invisible but in place so it can be chosen */
+
+.pdf-pages {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+  padding: 8px 0 24px;
+}
+
+.pdf-page {
+  position: relative;
+  flex: none;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-box);
+}
+
+.pdf-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.pdf-page.is-broken::after {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  content: 'This page could not be drawn';
+  color: var(--text-muted);
+}
+
+.pdf-text {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  line-height: 1;
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+.pdf-run {
+  position: absolute;
+  color: transparent;
+  font-family: sans-serif;
+  white-space: pre;
+  transform-origin: 0 0;
+}
+
+.pdf-text ::selection {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: transparent;
+}
+
+/* a figure that is chosen: a box over the page */
+
+.pdf-run .doc-num.is-pickable,
+.pdf-run.doc-cell.is-pickable {
+  padding: 0;
+  border-bottom: none;
+  border-radius: 2px;
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--accent) 70%, transparent);
+  color: transparent;
+}
+
+.pdf-run .doc-num.is-pickable:hover,
+.pdf-run.doc-cell.is-pickable:hover,
+.pdf-run .doc-num.is-pickable:focus-visible,
+.pdf-run.doc-cell.is-pickable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* what was chosen before, marked on the page */
+
+.pdf-run .is-picked,
+.pdf-run.is-picked {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+  color: transparent;
+}
+
+.pdf-pageno {
+  position: absolute;
+  bottom: -16px;
+  right: 0;
+  color: var(--text-muted);
+  font-size: 0.8em;
+}
+
+/* the OCR reading a scanned page: a notice over the page until its text is ready */
+
+.pdf-ocr {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  padding: 6px 14px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--panel-bg);
+  box-shadow: var(--shadow-menu);
+  color: var(--text);
+  font-size: 0.9em;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.pdf-ocr.is-done {
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.pdf-ocr.is-error {
+  border-color: var(--error-border);
+  color: var(--danger-fg);
+}
+
+/* reading with OCR only a box: it is drawn with the mouse over the page */
+
+.doc-picker-box[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--selection);
+}
+
+.doc-picker-body.is-boxing .pdf-page,
+.doc-picker-body.is-boxing .pdf-text {
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.pdf-box {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid var(--accent);
+  pointer-events: none;
+}
+
+.pdf-box.is-drawing {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.pdf-box.is-reading {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.pdf-box.is-read {
+  border-width: 1px;
+  border-style: dashed;
+}
+
+.pdf-box.is-empty,
+.pdf-box.is-error {
+  border-color: var(--error-border);
+}
+
+.pdf-box-note {
+  position: absolute;
+  bottom: 100%;
+  left: -2px;
+  padding: 1px 6px;
+  background: var(--accent-solid);
+  color: var(--accent-fg);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.pdf-box.is-empty .pdf-box-note,
+.pdf-box.is-error .pdf-box-note {
+  background: var(--error-border);
+}
+
+.cost-sys-row:focus-within {
+  background: var(--selection);
+}
+
+/* the buttons of a row, only visible on hover or with focus */
+.cost-sys-add,
+.cost-sys-del,
+.cost-sys-doc {
+  visibility: hidden;
+}
+
+.cost-sys-row:hover .cost-sys-add,
+.cost-sys-row:hover .cost-sys-del,
+.cost-sys-row:hover .cost-sys-doc,
+.cost-sys-row:focus-within .cost-sys-add,
+.cost-sys-row:focus-within .cost-sys-del,
+.cost-sys-row:focus-within .cost-sys-doc {
+  visibility: visible;
+}
+
+.cost-sys-doc {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border: 0;
+  padding: 2px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cost-sys-doc-spacer {
+  width: 22px;
+  flex: none;
+}
+
+.cost-sys-doc svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* which document the price came from */
+.cost-sys-origin {
+  color: var(--text-muted);
+  font-size: 0.8em;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cost-sys-foot {
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+
+
+/* el mismo margen interior que el resto de modales */
+.cost-sys-bar,
+.cost-sys-table,
+.cost-sys-dialog > .cost-error,
+.cost-sys-foot {
+  margin: 0 14px;
+}
+
+.cost-sys-bar {
+  margin-top: 8px;
+}
+
+/* the reference: the button to choose the price in a document and the file it came from */
+.cost-sys-refcell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  min-height: 26px;
+}
+
+.cost-sys-refcell .cost-sys-origin {
+  text-align: left;
+}
+
+.cost-sys-price {
+  min-width: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

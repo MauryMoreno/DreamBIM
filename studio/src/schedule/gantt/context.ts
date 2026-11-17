@@ -1,0 +1,56 @@
+import { GanttRow, GanttCallbacks, GanttOptions } from './types';
+import type { TaskDates } from '../plan';
+import type { Calendar } from '../state';
+
+/** What the parts of mountGantt share: its parameters and every local that more than one part uses. */
+export interface GanttContext {
+  host: HTMLElement;
+  cb: GanttCallbacks;
+  opts: GanttOptions;
+  root: HTMLElement;
+  zoomOut: HTMLButtonElement;
+  zoomIn: HTMLButtonElement;
+  slidePx: { wrap: HTMLLabelElement; input: HTMLInputElement; } | null;
+  slideRow: { wrap: HTMLLabelElement; input: HTMLInputElement; } | null;
+  rowsShort: HTMLButtonElement;
+  rowsTall: HTMLButtonElement;
+  split: HTMLDivElement;
+  HEADS: [string, string][];
+  listBody: HTMLTableSectionElement;
+  chart: HTMLDivElement;
+  scale: HTMLDivElement;
+  bars: HTMLDivElement;
+  links: SVGSVGElement;
+  dayline: HTMLDivElement;
+  dayHandle: HTMLDivElement;
+  placeHScroll: () => void;
+  empty: HTMLParagraphElement;
+  rows: GanttRow[];
+  span: TaskDates | null;
+  cal: Calendar;
+  rowH: number;
+  autoFit: boolean;
+  critical: boolean;
+  selected: string | null;
+  marked: Set<string>;
+  day: string | null;
+  editable: boolean;
+  origin: number;
+  px: () => number;
+  xOf: (d: string) => number;
+  sliderToPx: (t: number) => number;
+  sliderToRow: (t: number) => number;
+  syncZoomButtons: () => void;
+  stepPx: (dir: 1 | -1) => void;
+  setPx: (v: number) => void;
+  stepRow: (dir: 1 | -1) => void;
+  setRow: (v: number) => void;
+  fit: () => void;
+  clampToFit: () => void;
+  scrollTo: (d: string) => void;
+  edgeScroll: (onScroll: () => void) => { track(clientX: number): void; stop(): void; };
+  startDrag: (e: MouseEvent, r: GanttRow, barEl: HTMLElement, resize: boolean) => void;
+  render: () => void;
+  reveal: (id: string) => void;
+  placeDay: () => void;
+}

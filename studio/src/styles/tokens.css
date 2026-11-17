@@ -1,0 +1,198 @@
+/* Design tokens. This is the ONLY CSS with literal colors: the rest uses var(--token).
+   :root es el tema claro (barra de título oscura, acento azul); :root[data-theme="dark"] el oscuro.
+   theme.ts pone data-theme en <html>. Cada token de color tiene par oscuro, salvo los de la lista
+   de invariantes de test/css-tokens.test.ts. */
+:root {
+  /* Title bar (dark in both themes) */
+  --titlebar-bg: #2b2b2b;
+  --titlebar-fg: #e6e6e6;
+  --titlebar-hover: #3d3d3d;
+  --titlebar-close-hover: #c42b1c;
+  --titlebar-close-fg: #ffffff;
+  --brand: #6ea8fe;
+  --focus-on-dark: #6ea8fe;
+
+  /* Superficies */
+  --app-bg: #ececec;
+  --ribbon-bg: #f5f5f5;
+  --panel-bg: #ececec;
+  --panel-header-bg: #dcdcdc;
+  --card-bg: #ffffff;
+  --card-missing-bg: #f4f4f4;
+  --input-bg: #ffffff;
+  --chip-bg: #f7f7f7;
+  --border: #c8c8c8;
+  --toggle-border: #9a9a9a;
+
+  /* Texto e iconos */
+  --text: #1f1f1f;
+  --text-muted: #6b6b6b;
+  --text-disabled: #9a9a9a;
+  --icon-disabled: #a9b8cc;
+
+  /* Accent, selection and states */
+  --accent: #1a5fb4;
+  --link: #1a5fb4; /* acento cuando se usa como color de texto */
+  --accent-fg: #ffffff;
+  --accent-solid: #1a5fb4; /* fondo de superficies rellenas con texto --accent-fg (pestaña File) */
+  --accent-solid-hover: #164f96;
+  --selection: #cfe0f7;
+  --accent-hover-bg: #e3edfa;
+  --accent-hover-border: #b8cfee;
+  --hover-bg: #e2e2e2;
+
+  /* View tabs */
+  --tab-bg: #e6e6e6;
+  --tab-hover-bg: #f0f0f0;
+  --tab-active-bg: #ffffff;
+  --tab-close-hover-bg: #d9d9d9;
+
+  /* Vista 3D (--view-bg lo ve el modelado; --thumb-bg las miniaturas de recientes, igual en ambos temas) */
+  --view-bg: linear-gradient(#cfd8e3, #f2f2f2);
+  --thumb-bg: linear-gradient(#cfd8e3, #f2f2f2);
+
+  /* Errores */
+  --error-bg: #fde7e9;
+  --error-border: #d13438;
+  --error-fg: #7a1519;
+
+  /* Contextual ribbon tabs (Modify | ...) and their Finish / Cancel buttons */
+  --contextual-bg: #d8ecd6;
+  --ok-fg: #1e7e34;
+  --danger-fg: #c42b1c;
+
+  /* Notices, loading overlay and menus */
+  --toast-bg: #333333;
+  --toast-fg: #f2f2f2;
+  --toast-border: #1f1f1f;
+  --shadow-toast: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-box: 0 2px 10px rgba(0, 0, 0, 0.25);
+  --shadow-menu: 0 6px 18px rgba(0, 0, 0, 0.28);
+  --scrim: rgba(236, 236, 236, 0.7);
+
+  /* Inicio: columna lateral oscura */
+  --home-side-bg: #1e2a38;
+  --home-side-fg: #e6edf5;
+  --home-side-muted: #8fa3b8;
+  --home-side-hover: #2c3d52;
+
+  /* ViewCube */
+  --cube-home-fg: #4a4a4a;
+  --cube-home-hover-bg: rgba(255, 255, 255, 0.85);
+  --cube-face-bg: var(--cube-ring); /* las caras llevan el gris del anillo */
+  --cube-face-border: #4f555c;
+  --cube-face-fg: var(--cube-compass-fg);
+  --cube-face-hover-bg: #cfe0f7;
+  --cube-face-hover-fg: #1a5fb4;
+  --cube-shade: #1d2126; /* velo con el que se oscurecen las caras (opacidad en viewcube.ts) */
+  --cube-ring: #6f767e; /* anillo liso de la brújula */
+  --cube-compass-fg: #ffffff;
+  --cube-compass-hover-fg: #cfe6ff; /* letra de la brújula bajo el puntero */
+
+  /* Niveles en la vista 3D (el seleccionado usa --accent) */
+  --level-line: #5b6674;
+  --level-label-fg: #2a3139;
+  --level-label-bg: #ffffff;
+
+  /* Axis bars of the Move box: muted tones of the gizmo colors (AXIS_COLORS); they work in both themes */
+  --axis-x: #b4504f;
+  --axis-y: #5f9a5f;
+  --axis-z: #4a7cad;
+  --axis-fg: #ffffff;
+
+  --font: "Segoe UI", system-ui, sans-serif;
+  --font-size: 12px;
+  --titlebar-height: 32px;
+  --radius: 2px;
+
+  /* Frame of the Collection cards, by discipline */
+  --disc-arquitectura: #b98a3e;
+  --disc-electrico: #a8962f;
+  --disc-fontaneria: #3f7aa8;
+  --disc-hvac: #4a8f76;
+  --disc-mobiliario: #9a6a48;
+  --disc-other: #8c8c8c;
+  /* Pokedex of the Collection: stage of each card, track of the bars and big name */
+  --dex-stage: radial-gradient(120% 90% at 50% 38%, #ffffff 0%, #eef1f5 55%, #e1e6ec 100%);
+  --dex-track: #e3e7ec;
+  --dex-number: #9aa3ae;
+}
+
+:root[data-theme="dark"] {
+  --titlebar-bg: #16191d;
+  --titlebar-fg: #e6e6e6;
+  --titlebar-hover: #2a2f36;
+
+  --app-bg: #1f2329;
+  --ribbon-bg: #2f343b;
+  --panel-bg: #2b3037;
+  --panel-header-bg: #353b43;
+  --card-bg: #343a42;
+  --card-missing-bg: #2a2f35;
+  --input-bg: #23282e;
+  --chip-bg: #353b43;
+  --border: #4a5059;
+  --toggle-border: #7a828c;
+
+  --text: #e6e6e6;
+  --text-muted: #a0a7b0;
+  --text-disabled: #6b727b;
+  --icon-disabled: #4f5b6b;
+
+  --accent: #3d8bfd;
+  --link: #6ea8fe;
+  --accent-fg: #ffffff;
+  --accent-solid: #1f6feb;
+  --accent-solid-hover: #1a5fd0;
+  --selection: #24476f;
+  --accent-hover-bg: #2a3b52;
+  --accent-hover-border: #3f5f8a;
+  --hover-bg: #3a4048;
+
+  --tab-bg: #2b3037;
+  --tab-hover-bg: #3a4048;
+  --tab-active-bg: #444b55;
+  --tab-close-hover-bg: #555d68;
+
+  --view-bg: linear-gradient(#3a4250, #1e232a);
+
+  --error-bg: #4a2327;
+  --error-border: #f26b70;
+  --error-fg: #ffb4b8;
+
+  --contextual-bg: #33523b;
+  --ok-fg: #5bd17a;
+  --danger-fg: #ff7b72;
+
+  --toast-bg: #3c424b;
+  --toast-fg: #f2f2f2;
+  --toast-border: #5a616b;
+  --shadow-toast: 0 2px 8px rgba(0, 0, 0, 0.55);
+  --shadow-box: 0 2px 10px rgba(0, 0, 0, 0.5);
+  --shadow-menu: 0 6px 18px rgba(0, 0, 0, 0.55);
+  --scrim: rgba(20, 23, 27, 0.7);
+
+  --home-side-bg: #151a21;
+  --home-side-fg: #e6edf5;
+  --home-side-muted: #8fa3b8;
+  --home-side-hover: #26303d;
+
+  --cube-home-fg: #cfd5dc;
+  --cube-home-hover-bg: rgba(58, 66, 80, 0.9);
+  --cube-face-hover-bg: #2f5580;
+  --cube-face-hover-fg: #ffffff;
+
+  --level-line: #9aa7b6;
+  --level-label-fg: #e3e8ee;
+  --level-label-bg: #1f242a;
+
+  --disc-arquitectura: #c9a061;
+  --disc-electrico: #bfae52;
+  --disc-fontaneria: #6c9cc4;
+  --disc-hvac: #6eab93;
+  --disc-mobiliario: #b48a6a;
+  --disc-other: #8f8f8f;
+  --dex-stage: radial-gradient(120% 90% at 50% 38%, #353b45 0%, #272c34 55%, #1f2329 100%);
+  --dex-track: #353a42;
+  --dex-number: #6f7884;
+}
