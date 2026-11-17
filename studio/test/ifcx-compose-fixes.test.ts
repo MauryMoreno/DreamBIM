@@ -32,3 +32,21 @@ describe('variants', () => {
     expect(r.byPath.get('/R/d1')?.attributes).toEqual({ color: 'fromB' });
   });
 });
+
+describe('payloads', () => {
+  it('a payload file that also writes the model root does not hide the model', () => {
+    const model = file([
+      { path: 'proj', children: { w: 'wall' } },
+      { path: 'wall', payloads: { detail: { uri: './d.ifcx' } } },
+    ]);
+    const payload = file([
+      { path: 'proj', attributes: { extra: 1 } },
+      { path: 'det', attributes: { x: 1 } },
+    ], 'p');
+    const r = compose([model], { payloads: new Map([['./d.ifcx', payload]]) });
+    expect(r.root.children.map((c) => c.path)).toEqual(['/proj']);
+    expect(r.byPath.has('/proj/w/det')).toBe(true);
+    expect(r.byPath.has('/proj/w/proj')).toBe(false);
+    expect(r.warnings).toEqual([]);
+  });
+});

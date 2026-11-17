@@ -31,6 +31,10 @@ export function compose(layers: IfcxFile[], opts: ComposeOptions = {}): ComposeR
 
   const payloadRoots = new Map<string, string[]>();
   for (const [uri, f] of payloads) payloadRoots.set(uri, findRoots(flatten([f])));
+  if (payloads.size > 0) {
+    const layerRoots = new Set(findRoots(flatten(layers)));
+    for (const [uri, roots] of payloadRoots) payloadRoots.set(uri, roots.filter((r) => !layerRoots.has(r)));
+  }
   const hidden = new Set([...payloadRoots.values()].flat());
 
   const definedIn = new Map<string, number[]>();
