@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
-import { animOffset, focusRole, orthoDistance, sortLevels, type LevelInfo } from '../src/render/levels';
+import { animOffset, clipRange, focusRole, orthoDistance, sortLevels, type LevelInfo } from '../src/render/levels';
 
 const lv = (name: string, minZ: number): LevelInfo => ({ path: `/${name}`, name, minZ, maxZ: minZ + 3 });
 
@@ -79,5 +79,12 @@ describe('focusRole', () => {
     expect(focusRole('/p/b', f)).toBe('ancestor');
     expect(focusRole('/p/b/l4/muro', f)).toBe('hidden');
     expect(focusRole('/p/b/l22', f)).toBe('hidden'); // prefijo de texto, no de ruta
+  });
+});
+
+describe('clipRange', () => {
+  it('near follows the distance to the target and far covers the model', () => {
+    expect(clipRange(2700, 1000)).toEqual({ near: 0.27, far: 270000 });
+    expect(clipRange(2, 1000)).toEqual({ near: 0.001, far: 10000 });
   });
 });

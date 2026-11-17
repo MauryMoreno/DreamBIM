@@ -48,6 +48,14 @@ export function orthoDistance(dist: number, fromFov: number, toFov: number): num
 }
 
 /**
+ * Near and far planes that follow the distance to the target: near keeps what is close to the camera
+ * from being cut when zooming in, far always covers the whole model.
+ */
+export function clipRange(distance: number, modelDiagonal: number): { near: number; far: number } {
+  return { near: Math.max(distance / 1e4, 1e-3), far: Math.max(distance * 100, modelDiagonal * 10) };
+}
+
+/**
  * Camera minus target offset at fraction k (0...1) of an animation: the direction turns along the
  * shortest arc (the camera orbits the target instead of crossing it) and the distance interpolates
  * in a straight line.
