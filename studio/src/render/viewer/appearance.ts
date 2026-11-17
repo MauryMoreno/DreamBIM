@@ -163,8 +163,8 @@ export class ViewerAppearance {
    */
   setColorOverride(fn: ColorFn | null): void {
     this.colorOverride.set(fn);
-    this.peers.applyClipping(); // the new materials are clipped too
     this.applyMaterials();
+    this.peers.applyClipping(); // the materials created above are clipped too
   }
 
   /**
@@ -173,8 +173,8 @@ export class ViewerAppearance {
    */
   setSavedColors(colors: ReadonlyMap<string, ElementColor> | null): void {
     this.colorOverride.setSaved(colors);
-    this.peers.applyClipping();
     this.applyMaterials();
+    this.peers.applyClipping(); // the materials created above are clipped too
   }
 
   /**
@@ -183,8 +183,8 @@ export class ViewerAppearance {
    */
   setAssistantColors(colors: ReadonlyMap<string, ElementColor> | null): void {
     this.colorOverride.setTop(colors);
-    this.peers.applyClipping();
     this.applyMaterials();
+    this.peers.applyClipping(); // the materials created above are clipped too
   }
 
   /** Path of the element a mesh belongs to (stored on the mesh after the first time). */
