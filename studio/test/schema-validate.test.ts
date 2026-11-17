@@ -2,7 +2,10 @@
 // it meets it. Studio opens it anyway, but it has to warn when loading.
 import { describe, expect, it } from 'vitest';
 import type { IfcxFile, IfcxNode } from '../src/ifcx/types';
+import { parseIfcx } from '../src/ifcx/layers';
+import { packMeshes } from '../src/ifcx/packed';
 import { loadModel } from '../src/model/load';
+import { BUNDLED_SCHEMAS } from '../src/model/schemas';
 import { isSchemaWarning, schemaWarnings } from '../src/model/validate';
 
 const file = (data: IfcxNode[], schemas: IfcxFile['schemas'] = {}): IfcxFile => ({
@@ -51,6 +54,19 @@ describe('schemaWarnings', () => {
       'Invalid "x::rgb" (1 node, e.g. "N"): [1]: expected Real',
       'Invalid "x::kind" (1 node, e.g. "N"): expected one of a, b',
     ]);
+  });
+
+  it('a packed mesh (typed arrays) satisfies the USD mesh schema', () => {
+    const usd = parseIfcx(BUNDLED_SCHEMAS['https://ifcx.dev/@openusd.org/usd@v1.ifcx']);
+    const f = file([{ path: 'm', attributes: { 'usd::usdgeom::mesh': { points: [[0, 0, 0], [1, 0, 0], [0, 1, 0]], faceVertexIndices: [0, 1, 2] } } }]);
+    packMeshes(f);
+    expect(schemaWarnings([usd, f])).toEqual([]);
+  });
+
+  it('a typed array does not satisfy an array of strings', () => {
+    const names = { 'x::names': { value: { dataType: 'Array' as const, arrayRestrictions: { value: { dataType: 'String' as const } } } } };
+    const f = file([{ path: 'n', attributes: { 'x::names': new Uint32Array([1, 2]) } }], names);
+    expect(schemaWarnings([f])).toHaveLength(1);
   });
 
   it('loadModel incluye los avisos de esquema', async () => {
