@@ -1,0 +1,332 @@
+/* Library panel (at the bottom, across the left and the center): bar, folder tree, grid of cards and details. */
+.ws-library {
+  min-height: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+}
+
+.lib-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  background: var(--panel-bg);
+  color: var(--text);
+  font: var(--font-size) / 1.3 var(--font);
+}
+
+.lib-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-header-bg);
+}
+
+/* path field, like the address bar of the Omniverse Content */
+.lib-crumbs {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 22px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input-bg);
+}
+
+.lib-pick {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.lib-back,
+.lib-forward {
+  width: 22px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.lib-crumb,
+.lib-btn {
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+}
+
+.lib-crumb:disabled {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.lib-btn:disabled {
+  opacity: 0.4;
+}
+
+.lib-crumb:hover:not(:disabled),
+.lib-btn:hover:not(:disabled) {
+  border-color: var(--border);
+  background: var(--card-bg);
+}
+
+.lib-crumb:focus-visible,
+.lib-btn:focus-visible,
+.lib-tile:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.lib-crumb-sep {
+  color: var(--text-muted);
+}
+
+.lib-searchbox {
+  flex: 0 0 180px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.lib-searchbox > svg {
+  position: absolute;
+  left: 6px;
+  pointer-events: none;
+}
+
+.lib-search.pb-search {
+  width: 100%;
+  margin: 0;
+  padding-left: 24px;
+}
+
+/* body: tree | cards | details */
+.lib-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+
+.lib-tree {
+  flex: 0 0 200px;
+  min-width: 0;
+  overflow: auto;
+  padding: 3px 0;
+  border-right: 1px solid var(--border);
+}
+
+.lib-node {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding-right: 6px;
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+}
+
+.lib-node:hover {
+  background: var(--hover-bg);
+}
+
+.lib-node.current {
+  background: var(--selection);
+}
+
+.lib-node > svg {
+  flex: none;
+  color: var(--text-muted);
+}
+
+.lib-node-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* expansor cuadrado con + / −, como en Omniverse */
+.lib-toggle {
+  flex: none;
+  box-sizing: border-box;
+  width: 11px;
+  height: 11px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--text-muted);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--text-muted);
+  font: 10px / 1 var(--font);
+}
+
+.lib-toggle:hover {
+  color: var(--text);
+  border-color: var(--text);
+}
+
+.lib-toggle-empty {
+  border-color: transparent;
+}
+
+.lib-main {
+  --lib-tile: 84px;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.lib-empty {
+  flex: 1 1 auto;
+}
+
+.lib-zoombar {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  padding: 2px 8px;
+}
+
+.lib-zoom {
+  width: 110px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+/* detalles de la ficha elegida */
+.lib-details {
+  flex: 0 0 200px;
+  min-width: 0;
+  overflow: auto;
+  border-left: 1px solid var(--border);
+}
+
+.lib-details-head {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-header-bg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lib-props {
+  margin: 0;
+  padding: 6px 8px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 10px;
+}
+
+.lib-props dt {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.lib-props dd {
+  margin: 0;
+  min-width: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.lib-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--lib-tile, 84px), 1fr));
+  gap: 4px;
+  align-content: start;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+}
+
+.lib-grid[hidden],
+.lib-empty[hidden] {
+  display: none;
+}
+
+.lib-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: default;
+  user-select: none;
+}
+
+.lib-tile:hover {
+  background: var(--hover-bg);
+}
+
+.lib-tile.selected {
+  background: var(--selection);
+}
+
+.lib-file:not(.disabled) {
+  cursor: grab;
+}
+
+.lib-tile.dragging {
+  opacity: 0.5;
+}
+
+.lib-tile.disabled .lib-icon {
+  opacity: 0.5;
+}
+
+.lib-icon {
+  display: grid;
+  place-items: center;
+  width: calc(var(--lib-tile, 84px) * 0.52);
+  height: calc(var(--lib-tile, 84px) * 0.52);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  color: var(--text-muted);
+}
+
+.lib-icon svg {
+  width: 64%;
+  height: 64%;
+}
+
+.lib-dir .lib-icon {
+  border-color: transparent;
+  background: transparent;
+}
+
+.lib-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* Targets when dropping a card: the Stage node or the view */
+.lib-drop-target {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}

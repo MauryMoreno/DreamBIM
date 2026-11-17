@@ -1,0 +1,435 @@
+/* Docs: explorer of the project folder. Folder tree, table of files and the screen that hosts them.
+   Todos los colores salen de styles/tokens.css. */
+.doc-host {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.doc-center {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* --- Árbol de carpetas (izquierda) ------------------------------------------------ */
+.doc-tree {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.doc-tree-body {
+  overflow: auto;
+  padding: 4px 0;
+}
+
+.doc-tree-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.doc-tree-row {
+  display: flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 2px 8px;
+  color: var(--text);
+  cursor: default;
+  gap: 6px;
+}
+
+.doc-tree-row:hover {
+  background: var(--hover-bg);
+}
+
+.doc-tree-row.is-selected {
+  background: var(--selection);
+}
+
+.doc-tree-row:focus-visible {
+  outline: 1px solid var(--accent);
+}
+
+.doc-tree-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-tree-chevron {
+  flex: none;
+  width: 14px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  line-height: 1;
+  cursor: default;
+  transition: transform 0.12s;
+}
+
+.doc-tree-chevron.is-open {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doc-tree-chevron { transition: none; }
+}
+
+/* --- Tabla (centro) --------------------------------------------------------------- */
+.doc-table-host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+/* `hidden` no basta: display:flex de arriba lo anula. */
+.doc-table-host[hidden] {
+  display: none;
+}
+
+.doc-table {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--panel-bg);
+}
+
+.doc-table-bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.doc-search {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.doc-table-grid {
+  width: 100%;
+  border-collapse: collapse;
+  font: inherit;
+  color: var(--text);
+}
+
+.doc-table-grid th {
+  position: sticky;
+  top: 0;
+  padding: 4px 8px;
+  text-align: left;
+  background: var(--panel-header-bg);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.doc-table-grid td {
+  padding: 3px 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.doc-row {
+  cursor: default;
+}
+
+.doc-row:hover {
+  background: var(--hover-bg);
+}
+
+.doc-row.is-selected {
+  background: var(--selection);
+}
+
+.doc-name {
+  font-weight: 600;
+}
+
+.doc-empty {
+  padding: 12px;
+  color: var(--text-muted);
+}
+
+/* --- Pantalla Docs (desde Inicio) --------------------------------------------------- */
+.docs-screen {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--app-bg);
+  color: var(--text);
+}
+
+.docs-bar {
+  flex-wrap: wrap;
+}
+
+.docs-folder {
+  max-width: 28ch;
+  overflow: hidden;
+  color: var(--text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: rtl; /* si no cabe, se recorta el principio de la ruta */
+}
+
+.docs-tools {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.docs-btn:disabled {
+  color: var(--text-disabled);
+}
+
+.docs-body {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.docs-col {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--panel-bg);
+}
+
+.docs-left {
+  flex: 0 0 260px;
+  border-right: 1px solid var(--border);
+}
+
+.docs-center-col {
+  flex: 1;
+}
+
+.docs-body.is-empty .docs-col {
+  visibility: hidden;
+}
+
+.docs-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-muted);
+}
+
+.docs-empty[hidden] {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .docs-left { flex-basis: 200px; }
+}
+
+/* --- Explorador (centro de Docs) ---------------------------------------------------- */
+.doc-explorer {
+  outline: none;
+}
+
+.doc-nav {
+  gap: 6px;
+}
+
+.doc-up {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  color: var(--text);
+  font: inherit;
+  cursor: default;
+}
+
+.doc-up:hover:not(:disabled) {
+  background: var(--hover-bg);
+}
+
+.doc-up:disabled {
+  color: var(--text-disabled);
+}
+
+.doc-up-arrow {
+  line-height: 1;
+}
+
+/* Path as breadcrumbs: each segment can be clicked to go back to that folder */
+.doc-crumbs {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  align-items: center;
+  overflow: hidden;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input-bg);
+  white-space: nowrap;
+}
+
+.doc-crumb {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  padding: 1px 5px;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-overflow: ellipsis;
+  cursor: default;
+}
+
+.doc-crumb:hover {
+  background: var(--hover-bg);
+}
+
+.doc-crumb[aria-current='location'] {
+  font-weight: 600;
+}
+
+.doc-crumb-sep {
+  flex: none;
+  color: var(--text-muted);
+}
+
+.doc-nav .doc-search {
+  flex: 0 1 220px;
+}
+
+.doc-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.doc-table-grid {
+  table-layout: fixed;
+}
+
+.doc-table-grid th[data-col='name'] { width: 55%; }
+.doc-table-grid th[data-col='date'] { width: 18%; }
+.doc-table-grid th[data-col='type'] { width: 19%; }
+.doc-table-grid th[data-col='size'] { width: 8%; }
+
+.doc-table-grid th {
+  padding: 0;
+  font-weight: normal;
+}
+
+.doc-sort {
+  display: block;
+  width: 100%;
+  padding: 4px 8px;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  text-align: left;
+  cursor: default;
+}
+
+.doc-sort:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+
+.doc-table-grid th[aria-sort='ascending'] .doc-sort::after { content: ' ▲'; font-size: 0.7em; }
+.doc-table-grid th[aria-sort='descending'] .doc-sort::after { content: ' ▼'; font-size: 0.7em; }
+.doc-table-grid th[aria-sort='ascending'] .doc-sort,
+.doc-table-grid th[aria-sort='descending'] .doc-sort {
+  color: var(--text);
+}
+
+.doc-table-grid td {
+  border-bottom: 0;
+  max-width: none;
+}
+
+.doc-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.doc-name-cell .doc-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-icon {
+  flex: none;
+}
+
+.doc-icon.is-folder {
+  color: var(--accent);
+}
+
+.doc-icon.is-file {
+  color: var(--text-muted);
+}
+
+.doc-date,
+.doc-type,
+.doc-size {
+  color: var(--text-muted);
+}
+
+.doc-size {
+  text-align: right;
+}
+
+.doc-statusbar {
+  flex: none;
+  padding: 3px 10px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.92em;
+  white-space: pre;
+}
+
+.doc-empty {
+  margin: 0;
+  padding: 18px 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.doc-empty[hidden] {
+  display: none;
+}

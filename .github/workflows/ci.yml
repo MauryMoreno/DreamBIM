@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    name: Typecheck, test and knip
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: studio
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: studio/package-lock.json
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build the web demo (for the bundle budget test)
+        run: npm run build:web
+
+      # workspace.test.ts mounts the whole workspace: the default 2 GB heap of the runner is not enough.
+      - name: Test
+        run: npm test
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Knip
+        run: npm run knip
+
+      - name: Audit npm dependencies
+        run: npm audit --omit=dev --audit-level=moderate
+
+  rust:
+    name: Clippy and cargo test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: studio/src-tauri
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tauri system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev \
+            libayatana-appindicator3-dev libssl-dev patchelf
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: studio/src-tauri
+
+      # tauri-build requires frontendDist (../dist) to exist; the frontend is not built here.
+      - name: Empty frontendDist folder
+        run: mkdir -p ../dist
+
+      - name: Clippy
+        run: cargo clippy --all-targets --locked -- -D warnings
+
+      - name: Cargo test
+        run: cargo test --locked
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
+
+      # Fails on known vulnerabilities; the unmaintained/unsound warnings of Tauri's own dependencies do not fail it.
+      - name: Audit Rust dependencies
+        run: cargo audit

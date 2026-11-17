@@ -1,0 +1,72 @@
+/* Mode tabs in the title bar (dark in both themes) */
+.tb-modes {
+  display: none;
+  align-items: stretch;
+  padding: 0 8px;
+}
+
+body[data-screen='workspace'] .tb-modes {
+  display: flex;
+}
+
+.tb-mode-list {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.tb-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--titlebar-fg);
+  font: inherit;
+  cursor: default;
+}
+
+.tb-mode:hover:not(.active) {
+  background: var(--titlebar-hover);
+}
+
+.tb-mode.active {
+  background: var(--titlebar-hover);
+  border-bottom-color: var(--brand);
+  font-weight: 600;
+}
+
+.tb-mode:focus-visible {
+  outline: 1px solid var(--focus-on-dark);
+  outline-offset: -2px;
+}
+
+/* Content of a slot that does not belong to the active mode: it does not use hidden so as not to override that of its children */
+.ws-mode-off {
+  display: none !important;
+}
+
+.mode-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.mode-empty h2 {
+  margin: 0;
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mode-empty p {
+  margin: 0;
+}

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+target/
+.venv/
+__pycache__/
+.pytest_cache/
+converter/out/*.ifcx
+converter/out/*.json
+# BuiltBot build copied by studio/scripts/sync-builtbot.mjs
+studio/public/builtbot/

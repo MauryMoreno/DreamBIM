@@ -1,0 +1,29 @@
+# Normalizes line endings: LF in the repository and in the working copy,
+# so that Windows and Linux (CI) see the same bytes.
+* text=auto eol=lf
+
+# Binaries: never convert or diff as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.icns binary
+*.pdf binary
+*.gz binary
+*.zip binary
+*.wasm binary
+*.glb binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.rvt binary
+*.dll binary
+*.traineddata binary
+
+# Shell scripts must always carry LF.
+*.sh text eol=lf
+
+# Generated lockfiles: do not resolve merge conflicts line by line.
+studio/package-lock.json -diff
+studio/src-tauri/Cargo.lock -diff

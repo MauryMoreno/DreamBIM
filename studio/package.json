@@ -1,0 +1,45 @@
+{
+  "name": "ifcx-studio",
+  "private": true,
+  "license": "MIT",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "build:web": "tsc --noEmit -p tsconfig.build.json && vite build --mode web",
+    "sample:web": "vite-node scripts/web/make-sample.ts",
+    "addin:web": "vite-node scripts/web/make-addin.ts",
+    "deploy:web": "vite-node scripts/web/deploy.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "knip": "knip",
+    "sync-builtbot": "vite-node scripts/sync-builtbot.ts",
+    "tauri": "tauri",
+    "bench": "vite-node scripts/bench-load.ts"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-store": "^2.5.0",
+    "@tesseract.js-data/eng": "^1.0.0",
+    "@tesseract.js-data/spa": "^1.0.0",
+    "fflate": "^0.8.3",
+    "manifold-3d": "^3.5.4",
+    "pdfjs-dist": "^6.5.438",
+    "tesseract.js": "^7.0.0",
+    "tesseract.js-core": "^6.1.2",
+    "three": "0.171.0",
+    "three-mesh-bvh": "0.8.3"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "@types/node": "^22",
+    "@types/three": "0.171.0",
+    "happy-dom": "^21.0.4",
+    "knip": "^6.45.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vite-node": "^3.2.4",
+    "vitest": "^3.2.4"
+  }
+}
