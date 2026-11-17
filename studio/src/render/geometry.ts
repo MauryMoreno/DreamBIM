@@ -113,9 +113,6 @@ export function surfaceMaterial(node: ComposedNode): THREE.Material {
         transparent,
         depthWrite: !transparent, // glass must not hide what is behind it
         side: gltf.doubleSided ? THREE.DoubleSide : THREE.FrontSide,
-        polygonOffset: true,
-        polygonOffsetFactor: 1,
-        polygonOffsetUnits: 1,
       });
       if (colorTex) mat.map = loadTexture(colorTex, true, repeat);
       if (normalTex) {
@@ -144,9 +141,6 @@ export function surfaceMaterial(node: ComposedNode): THREE.Material {
       opacity,
       depthWrite: opacity >= 1,
       side: THREE.DoubleSide,
-      polygonOffset: true,
-      polygonOffsetFactor: 1,
-      polygonOffsetUnits: 1,
     });
     m.userData.srgbColor = true; // IFC diffuseColor: sRGB (Shaded and Consistent Colors reinterpret it)
     materialCache.set(key, m);

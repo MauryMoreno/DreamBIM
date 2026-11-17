@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { ComposedNode } from '../../ifcx/types';
 import { ColorOverride, type ColorFn, type ElementColor } from '../coloroverride';
+import { pullForward } from '../edgedepth';
 import { Highlights } from '../highlight';
 import { focusRole, type LevelFocus } from '../levels';
 import { StyleMaterials, type VisualStyle } from '../styles';
@@ -46,7 +47,7 @@ export class ViewerAppearance {
   private styleMats = new StyleMaterials();
   // per-element colour above its own material (setColorOverride)
   private colorOverride = new ColorOverride();
-  private edgeMat = new THREE.LineBasicMaterial({ color: 0x2f343a });
+  private edgeMat = pullForward(new THREE.LineBasicMaterial({ color: 0x2f343a }));
 
   constructor(private core: ViewerCore, private peers: AppearancePeers) {}
 
