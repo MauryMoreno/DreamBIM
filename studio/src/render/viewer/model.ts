@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { ComposedNode } from '../../ifcx/types';
 import { collectResources, disposeResources } from '../dispose';
 import { edgeMeshes, mergeEdges, sameMeshes } from '../edges';
-import { buildObject, geometryKind, isInvisible, transformOf } from '../geometry';
+import { geometryKind, isInvisible, transformOf, tryBuildObject } from '../geometry';
 import type { LevelFocus } from '../levels';
 import { perfSpan } from '../perf';
 import { accelerate } from '../pickaccel';
@@ -24,6 +24,8 @@ export interface ModelStats {
   curves: number;
   points: number;
   triangles: number;
+  /** Nodes with geometry that could not be drawn. */
+  failed: number;
 }
 
 /** Everything the model build, drawings and edges reach in the rest of the viewer. */
@@ -88,7 +90,7 @@ export class ViewerModel {
     this.core.pickables = [];
     this.peers.appearance.forgetHover();
 
-    const stats: ModelStats = { nodes: 0, meshes: 0, curves: 0, points: 0, triangles: 0 };
+    const stats: ModelStats = { nodes: 0, meshes: 0, curves: 0, points: 0, triangles: 0, failed: 0 };
     perfSpan('viewer.build', () => {
       if (root) for (const c of root.children) this.build(c, this.root, stats);
     });
@@ -198,8 +200,10 @@ export class ViewerModel {
     const a = node.attributes;
     if (isInvisible(a)) return;
     const kind = geometryKind(a);
-    const obj = (kind && buildObject(node, kind)) || new THREE.Group();
-    if (kind === 'mesh') {
+    const built = kind ? tryBuildObject(node, kind) : null;
+    const obj = built ?? new THREE.Group();
+    if (kind && !built) stats.failed++;
+    else if (kind === 'mesh') {
       stats.meshes++;
       accelerate(obj as THREE.Mesh); // BVH on the first ray that crosses it, not on load
       const g = (obj as THREE.Mesh).geometry;
@@ -215,7 +219,7 @@ export class ViewerModel {
     obj.userData.path = node.path;
     obj.userData.cls = ownerClass(node);
     obj.userData.ownClass = (node.attributes['bsi::ifc::class'] as any)?.code;
-    if (kind) {
+    if (kind && built) {
       obj.userData.baseMaterial = (obj as THREE.Mesh).material;
       obj.receiveShadow = kind === 'mesh';
       this.core.pickables.push(obj);

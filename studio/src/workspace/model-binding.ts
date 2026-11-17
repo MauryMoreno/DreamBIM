@@ -90,7 +90,7 @@ export function mountModelBinding(ctx: WorkspaceContext, deps: ModelBindingDeps)
     state.model = m;
     const root = m?.result.root ?? null;
     viewer.setSavedColors(m?.savedColors ?? null);
-    perfSpan('studio.viewer', () => viewer.setModel(root));
+    const stats = perfSpan('studio.viewer', () => viewer.setModel(root));
     state.levels = root ? perfSpan('studio.levels', () => withDocumentLevels(root, viewer.levels())) : []; // sorted bottom to top; includes Studio levels without geometry
     perfSpan('studio.browser', () => panels.setBrowserModel(root, state.levels));
     perfSpan('studio.stage', () => setStage({ ...panels.stageData, root }));
@@ -98,6 +98,9 @@ export function mountModelBinding(ctx: WorkspaceContext, deps: ModelBindingDeps)
     clearAssistantColors();
     selection.select(null);
     status.setMessage(null);
+    if (stats.failed > 0) {
+      status.setMessage(`${stats.failed} ${stats.failed === 1 ? 'element' : 'elements'} could not be drawn (see console)`);
+    }
     tabs.clear();
     tabs.open({ kind: '3d' });
     viewer.setProjection('perspective');
@@ -112,7 +115,7 @@ export function mountModelBinding(ctx: WorkspaceContext, deps: ModelBindingDeps)
     state.model = m;
     const root = m.result.root;
     viewer.setSavedColors(m.savedColors ?? null);
-    viewer.setModel(root);
+    const stats = viewer.setModel(root);
     state.levels = withDocumentLevels(root, viewer.levels());
     panels.setBrowserModel(root, state.levels);
     setStage({ ...panels.stageData, root });
@@ -132,6 +135,9 @@ export function mountModelBinding(ctx: WorkspaceContext, deps: ModelBindingDeps)
       deps.syncCostsRibbon();
     }
     if (modes.switcher.current === 'schedule') modes.schedule?.refresh();
+    if (stats.failed > 0) {
+      status.setMessage(`${stats.failed} ${stats.failed === 1 ? 'element' : 'elements'} could not be drawn (see console)`);
+    }
   }
 
   function dataChanged(): void {
