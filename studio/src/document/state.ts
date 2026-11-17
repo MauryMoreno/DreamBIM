@@ -23,8 +23,8 @@ export class DocumentState {
   /** Linked files already read, by uri (null = not found). */
   files: LinkedFiles = new Map();
   /**
-   * Loaded payloads, by uri as written. It is session state, as in USD: it is not
-   * saved in the document and does not enter undo.
+   * Loaded payloads, by the absolute location they resolve to. It is session state, as in USD:
+   * it is not saved in the document and does not enter undo.
    */
   payloads = new Map<string, IfcxFile>();
   /**

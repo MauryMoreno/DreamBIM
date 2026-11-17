@@ -12,8 +12,14 @@ const isPlain = (v: unknown): v is Record<string, unknown> =>
  * Fases 1 y 2: federar y aplanar. `null` en children/inherits/attributes elimina.
  * With `definedIn`, it annotates per path the indexes of the files that write it (in order).
  * With `warnings`, every ignored malformed item pushes one line.
+ * With `payloadKey`, each payload carries the identity it is loaded under.
  */
-export function flatten(layers: IfcxFile[], definedIn?: Map<string, number[]>, warnings?: string[]): Map<string, FlatNode> {
+export function flatten(
+  layers: IfcxFile[],
+  definedIn?: Map<string, number[]>,
+  warnings?: string[],
+  payloadKey?: (uri: string, fileIndex: number) => string,
+): Map<string, FlatNode> {
   const out = new Map<string, FlatNode>();
   const said = new Set<string>();
   const ignore = (line: string) => {
@@ -64,7 +70,10 @@ export function flatten(layers: IfcxFile[], definedIn?: Map<string, number[]>, w
       for (const [k, v] of Object.entries(field('attributes') ?? {})) f.attributes[k] = v;
       for (const [k, v] of Object.entries(field('variants') ?? {})) f.variants[k] = { ...f.variants[k], ...(v as Record<string, string>) };
       for (const [k, v] of Object.entries(field('variantSelection') ?? {})) f.variantSelection[k] = v as string;
-      for (const [k, v] of Object.entries(field('payloads') ?? {})) f.payloads[k] = v as FlatNode['payloads'][string];
+      for (const [k, v] of Object.entries(field('payloads') ?? {})) {
+        const p = v as FlatNode['payloads'][string];
+        f.payloads[k] = { ...p, key: payloadKey?.(p.uri, li) ?? p.uri };
+      }
     }
   }
   if (withoutPath) ignore(`Ignored ${withoutPath} ${withoutPath === 1 ? 'node' : 'nodes'} without a valid path`);

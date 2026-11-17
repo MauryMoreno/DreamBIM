@@ -39,7 +39,10 @@ export function compose(layers: IfcxFile[], opts: ComposeOptions = {}): ComposeR
 
   const definedIn = new Map<string, number[]>();
   const warnings: string[] = [];
-  const nodes = flatten(all, definedIn, warnings);
+  const keyOf = opts.payloadKey
+    ? (uri: string, li: number) => opts.payloadKey!(uri, li - payloads.size)
+    : undefined;
+  const nodes = flatten(all, definedIn, warnings, keyOf);
   const composer = new Composer(nodes, payloads, payloadRoots);
   composer.warnings = warnings;
   const roots = findRoots(nodes).filter((r) => !hidden.has(r));

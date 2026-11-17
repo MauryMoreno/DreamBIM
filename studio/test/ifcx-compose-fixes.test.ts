@@ -86,3 +86,17 @@ describe('malformed data', () => {
     expect(r.warnings).toEqual(['Ignored invalid "children" at "a"', 'Ignored invalid "attributes" at "a"']);
   });
 });
+
+it('two files that declare the same relative payload uri load independently', () => {
+  const a = file([{ path: 'ra', payloads: { d: { uri: './detail.ifcx' } } }], 'a');
+  const b = file([{ path: 'rb', payloads: { d: { uri: './detail.ifcx' } } }], 'b');
+  const detailA = file([{ path: 'da', attributes: { from: 'A' } }], 'pa');
+  const r = compose([a, b], {
+    payloads: new Map([['/x/a/detail.ifcx', detailA]]),
+    payloadKey: (uri, i) => `/x/${i === 0 ? 'a' : 'b'}/${uri.slice(2)}`,
+  });
+  expect(r.byPath.get('/ra')?.payloads?.d.loaded).toBe(true);
+  expect(r.byPath.get('/rb')?.payloads?.d.loaded).toBe(false);
+  expect(r.byPath.has('/ra/da')).toBe(true);
+  expect(r.byPath.has('/rb/da')).toBe(false);
+});

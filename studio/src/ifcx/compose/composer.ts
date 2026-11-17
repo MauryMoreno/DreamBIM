@@ -103,11 +103,12 @@ export class Composer {
   /** Composes the loaded payloads, below what the node already has. */
   private applyPayloads(target: WorkNode) {
     for (const [name, p] of target.payloads) {
-      if (target.loaded.has(name) || !this.payloadFiles.has(p.uri)) continue;
+      const key = p.key ?? p.uri;
+      if (target.loaded.has(name) || !this.payloadFiles.has(key)) continue;
       target.loaded.add(name);
       const add = (k: string, c: WorkNode) => { if (!target.children.has(k)) target.children.set(k, c); };
       if (!p.path) {
-        for (const r of this.payloadRoots.get(p.uri) ?? []) {
+        for (const r of this.payloadRoots.get(key) ?? []) {
           const c = this.resolve(r);
           if (c) add(r, c);
         }

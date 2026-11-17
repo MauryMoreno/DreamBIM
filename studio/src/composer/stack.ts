@@ -114,7 +114,8 @@ export async function composeStack(
     if (!imp.ok) warnings.push(`Import unavailable: ${imp.uri}${imp.error ? ` (${imp.error})` : ''}`);
   }
   // the provenance of each file (layer, edit, import) comes from the resolved stack
-  const result = compose(resolved.files, { payloads, sources: resolved.sources });
+  const payloadKey = (uri: string, i: number) => resolveUri(resolved.sources[i].location ?? path, uri);
+  const result = compose(resolved.files, { payloads, sources: resolved.sources, payloadKey });
   warnings.push(...result.warnings);
   warnings.push(...schemaWarnings(resolved.files));
   return { name, path, result, warnings, layer: base };

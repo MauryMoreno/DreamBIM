@@ -45,6 +45,8 @@ export interface IfcxPayload {
   uri: string;
   /** Path of the file composed here; without it, its roots as children. */
   path?: string;
+  /** Identity the payload is loaded under (set when flattening; never written to disk). */
+  key?: string;
 }
 
 export interface IfcxFile {

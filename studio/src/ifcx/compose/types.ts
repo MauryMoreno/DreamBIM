@@ -42,8 +42,13 @@ export const emptyWork = (origin: string): WorkNode => ({
 });
 
 export interface ComposeOptions {
-  /** Files of the loaded payloads, by the uri they are declared with. */
+  /** Files of the loaded payloads, by the identity they were loaded under. */
   payloads?: ReadonlyMap<string, IfcxFile>;
+  /**
+   * Identity a payload is loaded under. `fileIndex` indexes the layers (the payload files that go
+   * first are numbered from -1 downwards); without it the identity is the declared uri.
+   */
+  payloadKey?: (uri: string, fileIndex: number) => string;
   /** Procedencia de cada capa, en paralelo a `layers`; si la longitud no coincide se ignora. */
   sources?: readonly ProvenanceSource[];
 }

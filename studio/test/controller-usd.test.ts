@@ -19,7 +19,7 @@ class FakeWs implements DocWorkspace {
   setComposer() {}
 }
 
-async function linkedDoc(files: Record<string, string>) {
+async function linkedDoc(files: Record<string, string>, links = ['C:/p/a.ifcx']) {
   const disk = new Map(Object.entries(files));
   const ws = new FakeWs();
   const deps = {
@@ -39,7 +39,7 @@ async function linkedDoc(files: Record<string, string>) {
   const ctrl = new DocumentController(deps);
   await ctrl.newDocument();
   await ctrl.session!.saveTo('C:/p/casa.ifcx');
-  await ctrl.linkFile('C:/p/a.ifcx');
+  for (const link of links) await ctrl.linkFile(link);
   const layer = ctrl.composerLayers[0];
   const at = (p: string) => ws.models.at(-1)!.result.byPath.get(p)!;
   const kids = (p: string) => at(p)?.children.map((c) => c.name).sort();
@@ -102,7 +102,7 @@ describe('payloads', () => {
 
   it('cargar lee el archivo junto al que lo declara y compone su contenido, sin ensuciar el documento', async () => {
     const t = await linkedDoc({ 'C:/p/a.ifcx': site, 'C:/p/geo/b.ifcx': bld });
-    expect(t.at('/S/A').payloads).toEqual({ geo: { uri: './geo/b.ifcx', path: 'bld', loaded: false } });
+    expect(t.at('/S/A').payloads).toEqual({ geo: { uri: './geo/b.ifcx', path: 'bld', key: 'C:/p/geo/b.ifcx', loaded: false } });
     expect(t.kids('/S/A')).toEqual([]);
 
     expect(await t.ctrl.setPayloadLoaded('./geo/b.ifcx', true, t.layer.id)).toBe(true);
@@ -121,6 +121,43 @@ describe('payloads', () => {
     expect(await t.ctrl.setPayloadLoaded('./geo/b.ifcx', true, t.layer.id)).toBe(false);
     expect(t.deps.toast).toHaveBeenCalledWith(expect.stringContaining('b.ifcx'), 'error');
     expect(t.at('/S/A').payloads!.geo.loaded).toBe(false);
+  });
+
+  it('two layers that declare the same relative payload uri load their own file', async () => {
+    const layerA = JSON.stringify({
+      data: [
+        { path: 'PA', children: { A: 'slotA' } },
+        { path: 'slotA', payloads: { d: { uri: './detail.ifcx' } } },
+      ],
+    });
+    const layerB = JSON.stringify({
+      data: [
+        { path: 'PB', children: { B: 'slotB' } },
+        { path: 'slotB', payloads: { d: { uri: './detail.ifcx' } } },
+      ],
+    });
+    const t = await linkedDoc(
+      {
+        'C:/p/a/l.ifcx': layerA,
+        'C:/p/b/l.ifcx': layerB,
+        'C:/p/a/detail.ifcx': JSON.stringify({ data: [{ path: 'da', attributes: { from: 'A' } }] }),
+        'C:/p/b/detail.ifcx': JSON.stringify({ data: [{ path: 'db', attributes: { from: 'B' } }] }),
+      },
+      ['C:/p/a/l.ifcx', 'C:/p/b/l.ifcx'],
+    );
+    const [a, b] = t.ctrl.composerLayers;
+    expect(await t.ctrl.setPayloadLoaded('./detail.ifcx', true, a.id)).toBe(true);
+    expect(t.deps.readText).toHaveBeenLastCalledWith('C:/p/a/detail.ifcx');
+    expect(t.at('/PA/A').payloads!.d.loaded).toBe(true);
+    expect(t.at('/PB/B').payloads!.d.loaded).toBe(false);
+    expect(t.kids('/PA/A')).toEqual(['da']);
+    expect(t.kids('/PB/B')).toEqual([]);
+
+    expect(await t.ctrl.setPayloadLoaded('./detail.ifcx', true, b.id)).toBe(true);
+    expect(t.deps.readText).toHaveBeenLastCalledWith('C:/p/b/detail.ifcx');
+    expect(t.at('/PB/B').payloads!.d.loaded).toBe(true);
+    expect(t.kids('/PA/A')).toEqual(['da']);
+    expect(t.kids('/PB/B')).toEqual(['db']);
   });
 
   it('al abrir otro documento los payloads cargados se olvidan', async () => {
