@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
+import { orthoDistance } from '../src/render/levels';
 import { closestOnAxis, MIN_BOX_SIZE, SectionBox } from '../src/render/sectionbox';
 
 const v = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
@@ -100,5 +101,21 @@ describe('SectionBox', () => {
     b.updateScale(cam, v(5, 3, 1.5));
     b.root.updateMatrixWorld(true);
     expect(b.hitHandle(r)).toBe(0);
+  });
+
+  it('the handles keep their size when the fov narrows and the camera pulls back', () => {
+    const b = boxOf();
+    b.setVisible(true);
+    const target = v(5, 3, 1.5);
+    const scaleAt = (fov: number, dist: number) => {
+      const cam = new THREE.PerspectiveCamera(fov);
+      cam.position.copy(target).add(v(0, -dist, 0));
+      b.updateScale(cam, target);
+      const handle = b.root.children.find((c) => c.userData.face === 0)!;
+      return handle.scale.x;
+    };
+    const perspective = scaleAt(45, 20);
+    expect(perspective).toBeCloseTo(20 * 0.025);
+    expect(scaleAt(2, orthoDistance(20, 45, 2))).toBeCloseTo(perspective);
   });
 });

@@ -8,6 +8,8 @@ export const MIN_BOX_SIZE = 0.05;
 const DRAG_REACH = 0.25;
 /** Handle size on screen, as a fraction of the distance to the camera. */
 const HANDLE_SCREEN = 0.025;
+/** tan(22.5°): the half-fov at which the distance formula gives the handle size. */
+const REFERENCE_HALF_TAN = Math.tan(Math.PI / 8);
 
 export type FaceId = { axis: 0 | 1 | 2; sign: 1 | -1 };
 
@@ -158,7 +160,8 @@ export class SectionBox {
       const o = camera as THREE.OrthographicCamera;
       s = ((o.top - o.bottom) / o.zoom) * HANDLE_SCREEN;
     } else {
-      s = camera.position.distanceTo(target) * HANDLE_SCREEN;
+      const p = camera as THREE.PerspectiveCamera;
+      s = camera.position.distanceTo(target) * HANDLE_SCREEN * Math.tan(THREE.MathUtils.degToRad(p.fov / 2)) / REFERENCE_HALF_TAN;
     }
     for (const h of this.handles) h.scale.setScalar(s);
   }
